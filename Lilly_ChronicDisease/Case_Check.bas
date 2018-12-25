@@ -3,7 +3,7 @@ Application.ScreenUpdating = False
 Application.DisplayAlerts = False
 Dim shtsNumb%, errorNumb, errorReason$, i%, caseName$, standardName$, LastRow%
 Dim contentFilled$, tempValue%, doctorName$, tempName$, hospitalName$, serialNumb$
-Dim sht As Worksheet, rng As Range, errorBox As New Collection, workPath$
+Dim sht As Worksheet, rng As Range, errorBox As New Collection, workPath$, bmiCalc$, bmiFilled$
 
 errorNumb = 0
 '激活病例的工作簿，并获取病例名字
@@ -88,7 +88,98 @@ If i <> 15 Then
     GoTo Result_Print
 End If
 
+
 '【TODO】检验必填项是否填写
+i = 0
+errorNumb = 0
+For i = 1 To  
+    Select Case i
+        Case Is = 1                               '项目省份
+            If Cells(6,4) = "" Then errorNumb = 500  
+            If Cells(6,4) = "请选择省份" Then errorNumb = 501
+        Case Is = 2                               '医院
+            If Cells(10,4) = "" Then errorNumb = 502
+            If Cells(10,4) = "请选择医院" Then errorNumb = 503   
+        Case Is = 3                               '
+            If Cells(12,4) = "" Then errorNumb = 504
+            If Cells(12,4) = "" Then errorNumb =505
+        Case Is = 4                               '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =    
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =    
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =    
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =    
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =    
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =    
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =
+        Case Is =                                '
+            If Cells() = "" Then errorNumb = 
+            If Cells() = "" Then errorNumb =  
+
+    End Select
+    If errorNumb <> 0 Then errorBox.Add errorNumb
+Next
+
 
 '检验各项是否是从列表项选择出来的
 '【TODO】如果单元格是空的呢？
@@ -100,11 +191,11 @@ For i = 1 To 38
     Select Case i
         Case Is = 1
             contentFilled = Cells(6, 4).Value   '项目省份
-            Set rng = sht.Range("A2:A36")
+            Set rng = sht.Range("A3:A36")
             errorNumb = 5
         Case Is = 2
             contentFilled = Cells(10, 4).Value  '医院名称
-            Set rng = sht.Range("B2:B379")
+            Set rng = sht.Range("B3:B379")
             errorNumb = 6
         Case Is = 3
             contentFilled = Cells(14, 4).Value  '医生级别
@@ -316,7 +407,42 @@ Cells(8, 4) = "糖尿病"
 
 
 '验证BMI范围的准确性
-
+'Select case Cells(18,3) & " " & Cells(18,6)
+    ' case = "160cm以下 50kg以下" : bmiCalc = "ABC"
+    ' case = "160cm以下 50-60kg" : bmiCalc = "BCD"
+    'case = "160cm以下 60-70kg" : bmiCalc = "BCD"
+    ' case = "160cm以下 70-80kg" : bmiCalc = "CD"
+    'case = "160cm以下 80-90kg" : bmiCalc = "D"
+    'case = "160cm以下 90kg以上" : bmiCalc = "D"
+    'case = "160cm-170cm 50kg以下" : bmiCalc = "AB"
+    'case = "160cm-170cm 50-60kg" : bmiCalc = "ABC"
+    'case = "160cm-170cm 60-70kg" : bmiCalc = "ABC"
+    'case = "160cm-170cm 70-80kg" : bmiCalc = ""
+    'case = "160cm-170cm 80-90kg" : bmiCalc = ""
+    'case = "160cm-170cm 90kg以上" : bmiCalc = ""
+    'case = "170cm-180cm 50kg以下" : bmiCalc = ""
+    'case = "170cm-180cm 50-60kg" : bmiCalc = ""
+    'case = "170cm-180cm 60-70kg" : bmiCalc = ""
+    'case = "170cm-180cm 70-80kg" : bmiCalc = ""
+    'case = "170cm-180cm 80-90kg" : bmiCalc = ""
+    'case = "170cm-180cm 90kg以上" : bmiCalc = ""
+    'case = "180cm以上 50kg以下" : bmiCalc = ""
+    'case = "180cm以上 50-60kg" : bmiCalc = ""
+    'case = "180cm以上 60-70kg" : bmiCalc = ""
+    'case = "180cm以上 70-80kg" : bmiCalc = ""
+    'case = "180cm以上 80-90kg" : bmiCalc = ""
+    'case = "180cm以上 90kg以上" : bmiCalc = ""
+'End Select
+'Select case Cells(18,9)
+    'case = "＜18.5" : bmiFilled = "A"
+    'case = "18.5-23.9" : bmiFilled = "B"
+    'case = "24.0-27.9" : bmiFilled = "C"
+    'case = "≥28" : bmiFilled = "D"
+'End Select
+'If NOT bmiFilled Like bmiCalc Then 
+'    errorNumb = 
+'    errorBox.Add errorNumb
+'End if
 
 '文件名与医生信息的一致性检验
 Cells(12, 4) = Replace(Cells(12, 4), " ", "")  '清除姓名中的空格
@@ -411,7 +537,7 @@ For Each errorNumb In errorBox
         Case is = 42 : errorReason = "第15项#是否发生低血糖# 不是从下拉菜单中选的"    
         Case Is = 77: errorReason = "病例名字中含有非汉字字"
         Case Is = 88: errorReason = "医院不匹配"
-        Case Is = 99: errorReason = "医生姓名不匹配"    
+        Case Is = 99: errorReason = "医生姓名不匹配"   
         Case Is = 1000: errorReason = "病例使用的第一期模板"
         Case Is = 1001: errorReason = "病例很可能是第一期模板"
     End Select
@@ -434,5 +560,6 @@ Kill workPath & "\" & caseName
 Application.ScreenUpdating = True
 Application.DisplayAlerts = True
 End Sub
+
 
 
