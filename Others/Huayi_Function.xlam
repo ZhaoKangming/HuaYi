@@ -1,0 +1,67 @@
+'DelPunctuation 用于清除单元格内的所有标点符号
+Public Function DelPunctuation(Txt As String) As String
+With CreateObject("VBScript.RegExp")
+.Pattern = "[^\u4e00-\u9fBF\u0041-\u005a\u0061-\u007\u2150-\u218faa-zA-Z\d]"
+.IgnoreCase = True
+.Global = True
+DelPunctuation = .Replace(Txt, "")
+End With
+End Function
+
+'=============================================================================='
+
+'IdValid 用于验证身份证号码的有效性
+Public Function IdValid(IdNumb)
+    Dim b As Variant
+    a = Len(IdNumb)
+    If a = 0 Then IdValid = "空": GoTo 100  '先判断是否为空
+    
+    b = Right(IdNumb, 1)
+    If IsNumeric(b) Then
+      b = b * 1
+    Else: b = "X"
+    End If
+      
+    C = Left(Right(IdNumb, 18), 1) * 1
+    d = Left(Right(IdNumb, 17), 1) * 1
+    e = Left(Right(IdNumb, 16), 1) * 1
+    f = Left(Right(IdNumb, 15), 1) * 1
+    g = Left(Right(IdNumb, 14), 1) * 1
+    h = Left(Right(IdNumb, 13), 1) * 1
+    i = Left(Right(IdNumb, 12), 1) * 1
+    j = Left(Right(IdNumb, 11), 1) * 1
+    k = Left(Right(IdNumb, 10), 1) * 1
+    l = Left(Right(IdNumb, 9), 1) * 1
+    m = Left(Right(IdNumb, 8), 1) * 1
+    n = Left(Right(IdNumb, 7), 1) * 1
+    o = Left(Right(IdNumb, 6), 1) * 1
+    p = Left(Right(IdNumb, 5), 1) * 1
+    q = Left(Right(IdNumb, 4), 1) * 1
+    r = Left(Right(IdNumb, 3), 1) * 1
+    s = Left(Right(IdNumb, 2), 1) * 1
+    u = C * 7 + d * 9 + e * 10 + f * 5 + g * 8 + h * 4 + i * 2 + j * 1 + k * 6 + l * 3 + m * 7 + n * 9 + o * 10 + p * 5 + q * 8 + r * 4 + s * 2
+    v = u Mod 11
+          
+     If a = 15 Then IdValid = "老号，请认真核对！": GoTo 100
+     
+     If a = 18 Then
+        If v = 0 And b = 1 Then IdValid = "正确": GoTo 100
+        If v = 1 And b = 0 Then IdValid = "正确": GoTo 100
+        If v = 2 And b = "X" Then IdValid = "正确": GoTo 100
+        If v = 3 And b = 9 Then IdValid = "正确": GoTo 100
+        If v = 4 And b = 8 Then IdValid = "正确": GoTo 100
+        If v = 5 And b = 7 Then IdValid = "正确": GoTo 100
+        If v = 6 And b = 6 Then IdValid = "正确": GoTo 100
+        If v = 7 And b = 5 Then IdValid = "正确": GoTo 100
+        If v = 8 And b = 4 Then IdValid = "正确": GoTo 100
+        If v = 9 And b = 3 Then IdValid = "正确": GoTo 100
+        If v = 10 And b = 2 Then IdValid = "正确": GoTo 100
+     End If
+     
+     If (a <> 0) And (a <> 15) And (a <> 18) Then IdValid = "位数不对"
+     
+     If (IdValid <> "正确") And (IdValid <> "老号，请认真核对！") And (IdValid <> "空") And (IdValid <> "位数不对") Then IdValid = "出错啦"
+100:
+End Function
+
+
