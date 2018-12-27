@@ -1,14 +1,45 @@
 '以下按钮皆显示在一个用户窗体中
-Private Sub CertifExist_Click()
-'检验 *.zkm 的存在
-'判断医师资格证的存在
+
+
+'此按钮用于获取证件总文件夹内的文件及文件夹列表
+Private Sub GetFolder_Click()
+    Dim i%, docPath$, myFile, myFolder
+    docPath = "C:\Users\JokeComing\Desktop\证件\"
+    myFolder = Dir(docPath, 16)
+    i = 1
+    Do While myFolder <> ""
+    If myFolder <> "." And myFolder <> ".." Then
+        Cells(i, 1) = myFolder
+        i = i + 1
+    End If
+    myFolder = Dir
+    Loop
+    ThisWorkbook.Save
 End Sub
 
+
+'此按钮用于检测在证件总文件夹中是否有该医生的文件夹
+Private Sub DocFolderExist_Click()
+    Dim i%, j%
+    For i = 2 To 241
+        For j = 1 To 1015
+            If Cells(i, 3) Like Cells(j, 2) Then
+                Cells(i, 5) = Cells(j, 1)
+                Cells(i, 6) = "有"
+            End If
+       Next
+    Next
+    ThisWorkbook.Save
+    MsgBox "OK"
+End Sub
+
+
+'此按钮用于从证件总文件夹中复制出此次打款的医生的文件夹并以其编号命名文件夹
 Private Sub CopyRename_Click()
     Dim fso As Object, folderPath$, newPath$, i%, nameFile As Object
     VBA.MkDir "C:\Users\JokeComing\Desktop\医师资格证\"
     Set fso = CreateObject("Scripting.FileSystemObject")
-    For i = 1 To Range("d2000").End(xlUp).Row
+    For i = 2 To Range("d2000").End(xlUp).Row
         If Cells(i, 6) = "有" Then
             folderPath = "C:\Users\JokeComing\Desktop\证件\" & Cells(i, 5)
             newPath = "C:\Users\JokeComing\Desktop\医师资格证\" & Cells(i, 4)
@@ -19,39 +50,68 @@ Private Sub CopyRename_Click()
     Next
     Set fso = Nothing
     Set nameFile = Nothing
+    ThisWorkbook.Save
     MsgBox "所有都处理完了"
 End Sub
 
-Private Sub DocFolderExist_Click()
-Dim i%, j%
-For i = 1 To 246
-    For j = 1 To 1015
-        If Cells(i, 3) Like Cells(j, 2) Then
-            Cells(i, 5) = Cells(j, 1)
-            Cells(i, 6) = "有"
-        'Else
-            'Rows(i).Interior.Color = RGB(255, 255, 0)
+
+'此按钮用于检测文件夹中是否有资格证照片
+Private Sub CertifiExist_Click()
+    Dim i%, picPath$, myFile, j%
+    For i = 2 To 241
+        If Cells(i, 6) = "有" Then
+            picPath = "C:\Users\JokeComing\Desktop\医师资格证\" & Cells(i, 4) & "\"
+            myFile = Dir(picPath & "*.*")
+            j = 0
+            Do While myFile <> ""
+                If Right(myFile, 3) = "zkm" Then
+                    Kill myFile
+                Else
+                    j = j + 1
+                End If
+                myFile = Dir
+            Loop
+            If j > 0 Then Cells(i, 7) = "合格"
         End If
-   Next
-Next
-MsgBox "OK"
+    Next
+    ThisWorkbook.Save
+    MsgBox "所有都处理完了"
 End Sub
 
-Private Sub GetFolder_Click()
-Dim i%, docPath$, myFile, myFolder
-docPath = "C:\Users\JokeComing\Desktop\证件\"
-myFolder = Dir(docPath, 16)
-i = 1
-Do While myFolder <> ""
-If myFolder <> "." And myFolder <> ".." Then
-    Cells(i, 1) = myFolder
-    i = i + 1
-End If
-myFolder = Dir
-Loop
-End Sub
 
+'此按钮用于检测各医生的文件夹中是否存在文件扩展名不为“jpg”或“JPG”的图片
 Private Sub PicNameExtension_Click()
-'是否有非jpg
-'JPG改为jpg
+    Dim i%, picPath$, myFile
+    For i = 2 To 241
+        If Cells(i, 7) = "合格" Then
+            picPath = "C:\Users\JokeComing\Desktop\医师资格证\" & Cells(i, 4) & "\"
+            myFile = Dir(picPath & "*.*")
+            Do While myFile <> ""
+                If Right(myFile, 3) <> "jpg" And Right(myFile, 3) <> "JPG" Then Cells(i, 8) = "非jpg"
+                myFile = Dir
+            Loop
+        End If
+    Next
+    ThisWorkbook.Save
+    MsgBox "所有都处理完了"
+End Sub
+
+
+'此按钮用于重命名医师资格证的照片为“n.jpg”
+Private Sub ReNamePic_Click()
+    Dim i%, picPath$, myFile, j%
+    For i = 2 To 241
+        If Cells(i, 7) = "合格" Then
+            picPath = "C:\Users\JokeComing\Desktop\医师资格证\" & Cells(i, 4) & "\"
+            myFile = Dir(picPath & "*.*")
+            j = 1
+            Do While myFile <> ""
+                Name picPath & myFile As picPath & j & ".jpg"
+                j = j + 1
+                myFile = Dir
+            Loop
+        End If
+    Next
+    ThisWorkbook.Save
+    MsgBox "所有都处理完了"
 End Sub
