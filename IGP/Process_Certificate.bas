@@ -115,3 +115,40 @@ Private Sub ReNamePic_Click()
     ThisWorkbook.Save
     MsgBox "所有都处理完了"
 End Sub
+
+'该按钮用于将新找出的文件夹在表中标注出来并添加 “name.zkm”
+Private Sub FlagNewFolder_Click()
+    Application.ScreenUpdating = False
+    Dim i%, picPath$, myFile, myFolder, lastRow%, j%, rng As Range
+    Dim folderNumb%, fso As Object, nameFile As Object, newPath$
+    picPath = "C:\Users\JokeComing\Desktop\证件\"
+    myFolder = Dir(picPath, 16)
+    i = 1
+    Do While myFolder <> ""
+    If myFolder <> "." And myFolder <> ".." Then
+        Sheets("Temp").Cells(i, 1) = myFolder
+        i = i + 1
+    End If
+    myFolder = Dir
+    Loop
+    lastRow = Sheets("Temp").Range("a2000").End(xlUp).Row
+    Set rng = Sheets("Temp").Range(Cells(1, 1), Cells(lastRow, 1))
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    For j = 2 To 241
+        folderNumb = Application.WorksheetFunction.CountIf(rng, Cells(j, 4))
+        If folderNumb > 0 Then
+            If Cells(j, 7) = "合格" Then
+                Cells(j, 9) = "重复"
+            Else
+                Cells(j, 9) = "New " & folderNumb
+                newPath = picPath & "\" & Cells(j, 4) & "\"
+                Set nameFile = fso.CreateTextFile(newPath & Cells(j, 3) & ".zkm", True)
+            End If
+        End If
+    Next
+    Set nameFile = Nothing
+    Set fso = Nothing
+    Application.ScreenUpdating = True
+    ThisWorkbook.Save
+    MsgBox "所有都处理完了"
+End Sub
