@@ -1,5 +1,7 @@
 '以下按钮皆显示在一个用户窗体中
 
+'【TODO】定义公共变量，设置部分变量参数传递
+
 '此按钮用于将新整理出的文件夹确认合格后在表格标注出来
 Private Sub AddNewQualified_Click()
     Dim i%
