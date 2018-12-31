@@ -82,8 +82,8 @@ Dim doc_numb%, File As Object, doc As Document, WdFile$
  With CreateObject("Scripting.FileSystemObject")  '引用FSO对象
  For Each File In .GetFolder("C:\Users\joke\Desktop").Files  '遍历
      If (Right(File.Name, 3)) = "doc" Or (Right(File.Name, 4)) = "docx" Then
-     doc_numb = doc_numb + 1
-        End If
+         doc_numb = doc_numb + 1
+    End If
     Next
   End With
  If doc_numb > 0 Then
@@ -96,5 +96,4 @@ Dim doc_numb%, File As Object, doc As Document, WdFile$
  End If
 End Sub
 
-'如果不好满足随时切换excel and word
-'不防将 合格不合格信息 返回到一个word文件？xml？  然后后续再一起处理到excel中
+'如果不好满足随时切换excel and word,不防将 合格不合格信息 返回到一个word文件？xml？然后后续再一起处理到excel中
