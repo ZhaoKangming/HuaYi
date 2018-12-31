@@ -73,20 +73,20 @@ Columns("C:K").ClearContents
 '提取超链接
 Dim ArrayHL(0 To 200, 0 To 1) As String '200这个数是随意写的，只要大于最大行数就行
 For rowNumb = 1 To lastRow_Temp
-  ArrayHL(rowNumb - 1, 0) = Range("B" & rowNumb).Hyperlinks(1).Address
+    ArrayHL(rowNumb - 1, 0) = Range("B" & rowNumb).Hyperlinks(1).Address
 Next
 Worksheets("中转").Range("C1").Resize(lastRow_Temp, 1).Value = ArrayHL
 '下载报告
 myFolder = "E:\华医网\IGP2.0\报告审核\报告原文\" & reportDate & "\"
 MkDir myFolder
 For rowNumb = 1 To lastRow_Temp
-extensionName = Split(Right(Cells(rowNumb,3),6), ".")(1)
-Filename = Cells(rowNumb, 1) & "." & extensionName
-fileLink = Cells(rowNumb, 3)
-If URLDownloadToFile(0&, fileLink, myFolder & Filename, 0&, 0&) = 0 Then
-Else
-  MsgBox "Failure"
-End If
+    extensionName = Split(Right(Cells(rowNumb,3),6), ".")(1)
+    Filename = Cells(rowNumb, 1) & "." & extensionName
+    fileLink = Cells(rowNumb, 3)
+    If URLDownloadToFile(0&, fileLink, myFolder & Filename, 0&, 0&) = 0 Then
+    Else
+        MsgBox "Failure"
+    End If
 Next
 '【TODO】如何确定是否有报告没有下载，没有下载的标注出来
 '【TODO】复制内容到桌面，以及合格库
