@@ -1,7 +1,7 @@
 Sub Case_Check()
 Application.ScreenUpdating = False
 Application.DisplayAlerts = False
-Dim shtsNumb%, errorNumb, errorReason$, i%, caseName$, standardName$, LastRow%, HypoGlyTimeNumb%, HypoGlyValueNumb%
+Dim shtsNumb%, errorNumb, errorReason$, i%,j%, caseName$, standardName$, LastRow%, HypoGlyTimeNumb%, HypoGlyValueNumb%
 Dim contentFilled$, tempValue%, doctorName$, tempName$, hospitalName$, serialNumb$, reg, FindWords, ACell
 Dim sht As Worksheet, rng As Range, errorBox As New Collection, workPath$, bmiCalc$, bmiFilled$
 
@@ -22,7 +22,7 @@ Next
 
 '表数与表名的检验
 shtsNumb = Worksheets.Count
-If shtsNumb = 1 Then errorNumb = 1
+If shtsNumb = 1 And WorkSheets(1).Cells(4,2) = "1.项目名称：" Then errorNumb = 2
 If shtsNumb = 2 Then
     If Worksheets(1).Name <> "案例模板" Or Worksheets(2).Name <> "下拉菜单" Then 
         If WorkSheets(1).Cells(4,2) = "1.项目名称：" Then 
@@ -110,7 +110,7 @@ End With
  Set reg = CreateObject("vbscript.regexp")
     reg.IgnoreCase = True '是否忽略大小写
     With ActiveSheet
-        FindWords = Array("mg/dl", "mgdl")
+        FindWords = Array("mg/dl", "mgdl")    'Array内是要查询的内容
         reg.Pattern = "(" & Join(FindWords, ")|(") & ")"
         i = 0
         For Each ACell In .UsedRange
@@ -195,100 +195,46 @@ For i = 1 To 66
             If Trim(Cells(27,9)) = "" Then errorNumb = 527
             If Cells(27,9) = "（必填）" Then errorNumb = 528   
         Case Is = 15                               '第九项 肝肾功能
-            If Trim(Cells(27,12)) = "" Then errorNumb = 529
-            If Cells(27,12) = "（必填）" Then errorNumb = 530
+            If Trim(Cells(27,12)) = "" Or Trim(Cells(27,12)) = "（必填）" Then Cells(27,12) = "正常"
         Case Is = 16                               '第九项 尿糖 
-            If Trim(Cells(28,3)) = "" Then errorNumb = 531
-            If Cells(28,3) = "（必填）" Then errorNumb = 532 
+            If Trim(Cells(28,3)) = "" Or Trim(Cells(28,3)) = "（必填）" Then Cells(28,3) = "-"
         Case Is = 17                                '第九项 尿蛋白
-            If Trim(Cells(28,6)) = "" Then errorNumb = 533
-            If Cells(28,6) = "（必填）" Then errorNumb = 534   
+            If Trim(Cells(28,6)) = ""Or Trim(Cells(28,6)) = "（必填）" Then Cells(28,6) = "-"
         Case Is = 18                               '第九项 C肽
-            If Trim(Cells(28,9)) = "" Then errorNumb = 535
-            If Cells(28,9) = "（必填）" Then errorNumb = 536
+            If Trim(Cells(28,9)) = "" Or Trim(Cells(28,9)) = "（必填）" Then errorNumb = 536
         Case Is = 19                               '第十项 糖尿病类型
             If Trim(Cells(31,3)) = "" Then errorNumb = 537
             If Cells(31,3) = "请选择" Then errorNumb = 538 
-        Case Is = 20                               '第十项 并发症(第32行)
-            If Cells(32,3) = "无" Or Trim(Cells(32,3)) = "" Then 
-                If Cells(32,4) <> "无" And Trim(Cells(32,4)) <> "" Then errorNumb = 539
-            Elseif Cells(32,3) = "大血管并发症" Then   
-                If Cells(32,4) = "无" Or Trim(Cells(32,4)) = "" Then 
-                    errorNumb = 540
-                Else
-                    Set rng = sht.Range("F19:F22")
-                    If Application.WorksheetFunction.CountIf(rng, Trim(Cells(32,4))) <> 0 Then errorNumb = 541
-                End If
-            Elseif Cells(32,3) = "微血管并发症" Then   
-                If Cells(32,4) = "无" Or Trim(Cells(32,4)) = "" Then 
-                    errorNumb = 540
-                Else
-                    Set rng = sht.Range("F15:F18")
-                    If Application.WorksheetFunction.CountIf(rng, Trim(Cells(32,4))) <> 0 Then errorNumb = 541
-                End If
-            End If            
-        Case Is = 21                               '第十项 并发症(第33行)
-            If Cells(33,3) = "无" Or Trim(Cells(33,3)) = "" Then 
-                If Cells(33,4) <> "无" And Trim(Cells(33,4)) <> "" Then errorNumb = 542
-            Elseif Cells(33,3) = "大血管并发症" Then   
-                If Cells(33,4) = "无" Or Trim(Cells(33,4)) = "" Then 
-                    errorNumb = 543
-                Else
-                    Set rng = sht.Range("F19:F22")
-                    If Application.WorksheetFunction.CountIf(rng, Trim(Cells(33,4))) <> 0 Then errorNumb = 544
-                End If
-            Elseif Cells(33,3) = "微血管并发症" Then   
-                If Cells(33,4) = "无" Or Trim(Cells(33,4)) = "" Then 
-                    errorNumb = 543
-                Else
-                    Set rng = sht.Range("F15:F18")
-                    If Application.WorksheetFunction.CountIf(rng, Trim(Cells(33,4))) <> 0 Then errorNumb = 544
-                End If
-            End If               
-        Case Is = 22                               '第十项 并发症(第34行)
-            If Cells(34,3) = "无" Or Trim(Cells(34,3)) = "" Then 
-                If Cells(34,4) <> "无" And Trim(Cells(34,4)) <> "" Then errorNumb = 545
-            Elseif Cells(34,3) = "大血管并发症" Then   
-                If Cells(34,4) = "无" Or Trim(Cells(34,4)) = "" Then 
-                    errorNumb = 546
-                Else
-                    Set rng = sht.Range("F19:F22")
-                    If Application.WorksheetFunction.CountIf(rng, Trim(Cells(34,4))) <> 0 Then errorNumb = 547
-                End If
-            Elseif Cells(34,3) = "微血管并发症" Then   
-                If Cells(34,4) = "无" Or Trim(Cells(34,4)) = "" Then 
-                    errorNumb = 546
-                Else
-                    Set rng = sht.Range("F15:F18")
-                    If Application.WorksheetFunction.CountIf(rng, Trim(Cells(34,4))) <> 0 Then errorNumb = 547
-                End If
-            End If               
+        'Case Is = 20                               '第十项 并发症(第32行)
+            'If Cells(32,3) = "无" Or Trim(Cells(32,3)) = "" Then 
+                'If Cells(32,4) <> "无" And Trim(Cells(32,4)) <> "" Then errorNumb = 539
+            'Elseif Cells(32,3) = "大血管并发症" Then   
+                'If Cells(32,4) = "无" Or Trim(Cells(32,4)) = "" Then 
+                    'errorNumb = 540
+                'Else
+                    'Set rng = sht.Range("F19:F22")
+                    'If Application.WorksheetFunction.CountIf(rng, Trim(Cells(32,4))) <> 0 Then errorNumb = 541
+                'End If
+            'Elseif Cells(32,3) = "微血管并发症" Then   
+                'If Cells(32,4) = "无" Or Trim(Cells(32,4)) = "" Then 
+                    'errorNumb = 540
+                'Else
+                    'Set rng = sht.Range("F15:F18")
+                    'If Application.WorksheetFunction.CountIf(rng, Trim(Cells(32,4))) <> 0 Then errorNumb = 541
+                'End If
+            'End If                          
         Case Is = 23                               '第十一项 胰岛素治疗
+            j = 0
+            If Trim(Cells(38,6)) <> "（必填）" And Trim(Cells(38,6)) <> "" Then j = j + 1
+            If Trim(Cells(38,7)) <> "（必填）" And Trim(Cells(38,7)) <> "" Then j = j + 1
+            If Trim(Cells(38,8)) <> "（必填）" And Trim(Cells(38,8)) <> "" Then j = j + 1
+            If Trim(Cells(38,9)) <> "（必填）" And Trim(Cells(38,9)) <> "" Then j = j + 1
+
             If Cells(38,3) = "未使用" Or Trim(Cells(38,3)) = "" Then
                 If Cells(38,4) <> "未使用" And Trim(Cells(38,4)) <> "" Then 
                     errorNumb = 548
                 Else 
-                    i = 0
-                    If Cells(38,6) <> "（必填）" And Trim(Cells(38,6)) <> "" Then i = i + 1
-                    If Cells(38,7) <> "（必填）" And Trim(Cells(38,6)) <> "" Then i = i + 1
-                    If Cells(38,8) <> "（必填）" And Trim(Cells(38,6)) <> "" Then i = i + 1
-                    If Cells(38,9) <> "（必填）" And Trim(Cells(38,6)) <> "" Then i = i + 1
-                    If i > 0 Then 
-                        errorNumb = 549
-                    Else
-                        i = 0
-                        If Cells(39,3) <> "未使用" And Trim(Cells(39,3)) <> "" Then i = i + 1
-                        If Cells(39,4) <> "未使用" And Trim(Cells(39,4)) <> "" Then i = i + 1
-                        If Cells(39,5) <> "未使用" And Trim(Cells(39,5)) <> "" Then i = i + 1
-                        If Cells(39,6) <> "未使用" And Trim(Cells(39,6)) <> "" Then i = i + 1
-                        If Cells(39,7) <> "未使用" And Trim(Cells(39,7)) <> "" Then i = i + 1
-                        If Cells(40,3) <> "未使用" And Trim(Cells(40,3)) <> "" Then i = i + 1
-                        If i = 0 Then
-                            errorNumb = 550
-                        Else
-                            errorNumb = 551
-                        End If               
-                    End If
+                    If j > 0 Then errorNumb = 549
                 End If
             Elseif Cells(38,3) = "预混胰岛素" Then
                 If Cells(38,4) = "未使用" Or Trim(Cells(38,4)) = "" Then 
@@ -303,19 +249,14 @@ For i = 1 To 66
                 Elseif Cells(38,4) = "赖脯胰岛素50两针" Or Cells(38,4) = "赖脯胰岛素50三针" Then
                     errorNumb = 553
                 End If
+            End If        
+        Case Is = 24                               '第十一项 方案针数与剂量次数一致性检验
+            If Cells(38,3) = "强化治疗" and j <> 4 Then 
+                errorNumb = 554
+            Elseif Cells(38,3) = "预混胰岛素." Then
+                If Cells(38,4) = "赖脯胰岛素50两针" And j <> 2 Then errorNumb = 555
+                If Cells(38,4) = "赖脯胰岛素50三针" And j <> 3 Then errorNumb = 555
             End If
-        Case Is = 24                               '第十一项 早剂量
-            If Trim(Cells(38,6)) = "" Then errorNumb = 554
-            If Cells(38,6) = "（必填）" Then errorNumb = 555
-        Case Is = 25                               '第十一项 中剂量
-            If Trim(Cells(38,7)) = "" Then errorNumb = 556
-            If Cells(38,7) = "（必填）" Then errorNumb = 557   
-        Case Is = 26                               '第十一项 晚剂量
-            If Trim(Cells(38,8)) = "" Then errorNumb = 558
-            If Cells(38,8) = "（必填）" Then errorNumb = 559
-        Case Is = 27                               '第十一项 睡前剂量
-            If Trim(Cells(38,9)) = "" Then errorNumb = 560
-            If Cells(38,9) = "（必填）" Then errorNumb = 561 
         Case Is = 28                                '第十二项 强化方案前 空腹
             If Trim(Cells(45,5)) = "" Then errorNumb = 562
             If Trim(Cells(45,5)) = "（必填）" Then errorNumb = 563
@@ -433,18 +374,17 @@ For i = 1 To 66
                 If Trim(Cells(52,2)) = "" Then errorNumb = 618
                 If Trim(Cells(52,2)) = "无" Then errorNumb = 619
             End If
-        Case Is = 57                               '第十三项 强化转预混剂量 1
-            If Trim(Cells(52,2)) = "赖脯胰岛素50两针" Or Trim(Cells(52,2)) = "赖脯胰岛素50三针" Then
-                If Trim(Cells(52,5)) = "" Or Trim(Cells(52,5)) = "（必填）" Then errorNumb = 620
-            End If
-        Case Is = 58                               '第十三项 强化转预混剂量 2
-            If Trim(Cells(52,2)) = "赖脯胰岛素50两针" Or Trim(Cells(52,2)) = "赖脯胰岛素50三针" Then
-                If Trim(Cells(52,6)) = "" Or Trim(Cells(52,5)) = "（必填）" Then errorNumb = 621
-            End If
-        Case Is = 59                               '第十三项 强化转预混剂量 3
-            If Trim(Cells(52,2)) = "赖脯胰岛素50两针" Or Trim(Cells(52,2)) = "赖脯胰岛素50三针" Then
-                If Trim(Cells(52,7)) = "" Or Trim(Cells(52,5)) = "（必填）" Then errorNumb = 622
-            End If
+        Case Is = 57                               '第十三项 强化转预混剂量 
+            j = 0
+            If Trim(Cells(52,5)) <> "" And Trim(Cells(52,5)) <> "（必填）" Then j = j + 1
+            If Trim(Cells(52,6)) <> "" And Trim(Cells(52,6)) <> "（必填）" Then j = j + 1
+            If Trim(Cells(52,7)) <> "" And Trim(Cells(52,7)) <> "（必填）" Then j = j + 1
+            If Trim(Cells(52,2)) = "赖脯胰岛素50两针" Then
+                If j <> 2 Then errorNumb = 620
+            Elseif Trim(Cells(52,2)) = "赖脯胰岛素50三针" Then
+                If j <> 3 Then errorNumb = 620
+            End if    
+          
         Case Is = 60                               '第十四项 出院空腹血糖
             If Trim(Cells(56,3)) = "" Or Trim(Cells(56,3)) = "（必填）" Then errorNumb = 623
         Case Is = 61                               '第十四项 出院早餐后血糖
@@ -745,7 +685,7 @@ For Each errorNumb In errorBox
     i = i + 1
     Select Case errorNumb
         Case Is = 0 : errorReason = "合格"
-        Case Is = 1 : errorReason = "病例只有一张表"
+       ' Case Is = 1 : errorReason = "病例只有一张表"
         Case Is = 2 : errorReason = "未发现病例数据表"
         Case Is = 3 : errorReason = "病例含有 " & shtsNumb & " 张非空工作表"
         Case Is = 4 : errorReason = "有 " & 15 - i & " 项位置发生了变化"
@@ -768,15 +708,15 @@ For Each errorNumb In errorBox
         Case is = 21 : errorReason = "第8项#GLP-1治疗1# 不是从下拉菜单中选的"
         Case is = 22 : errorReason = "第8项#GLP-1治疗2# 不是从下拉菜单中选的"
         Case is = 23 : errorReason = "第10项#糖尿病类型# 不是从下拉菜单中选的"
-        Case is = 24 : errorReason = "第10项#并发症1-1# 不是从下拉菜单中选的"
-        Case is = 25 : errorReason = "第10项#并发症2-1# 不是从下拉菜单中选的"
-        Case is = 26 : errorReason = "第10项#并发症3-1# 不是从下拉菜单中选的"
-        Case is = 27 : errorReason = "第10项#并发症1-2# 不是从下拉菜单中选的"
-        Case is = 28 : errorReason = "第10项#并发症2-2# 不是从下拉菜单中选的"
-        Case is = 29 : errorReason = "第10项#并发症3-2# 不是从下拉菜单中选的"
-        Case is = 30 : errorReason = "第10项#合并症1# 不是从下拉菜单中选的"
-        Case is = 31 : errorReason = "第10项#合并症2# 不是从下拉菜单中选的"
-        Case is = 32 : errorReason = "第10项#合并症3# 不是从下拉菜单中选的"
+        ' Case is = 24 : errorReason = "第10项#并发症1-1# 不是从下拉菜单中选的"
+        ' Case is = 25 : errorReason = "第10项#并发症2-1# 不是从下拉菜单中选的"
+        ' Case is = 26 : errorReason = "第10项#并发症3-1# 不是从下拉菜单中选的"
+        ' Case is = 27 : errorReason = "第10项#并发症1-2# 不是从下拉菜单中选的"
+        ' Case is = 28 : errorReason = "第10项#并发症2-2# 不是从下拉菜单中选的"
+        ' Case is = 29 : errorReason = "第10项#并发症3-2# 不是从下拉菜单中选的"
+        ' Case is = 30 : errorReason = "第10项#合并症1# 不是从下拉菜单中选的"
+        ' Case is = 31 : errorReason = "第10项#合并症2# 不是从下拉菜单中选的"
+        ' Case is = 32 : errorReason = "第10项#合并症3# 不是从下拉菜单中选的"
         Case is = 33 : errorReason = "第11项#胰岛素治疗1# 不是从下拉菜单中选的"
         Case is = 34 : errorReason = "第11项#胰岛素治疗2# 不是从下拉菜单中选的"
         Case is = 35 : errorReason = "第11项#合并口服降糖药治疗1# 不是从下拉菜单中选的"
@@ -822,39 +762,39 @@ For Each errorNumb In errorBox
         Case Is = 526 : errorReason = "第九项 未填写餐后2小时血糖"
         Case Is = 527 : errorReason = "第九项 糖化血红蛋白为空"
         Case Is = 528 : errorReason = "第九项 未填写糖化血红蛋白"
-        Case Is = 529 : errorReason = "第九项 肝肾功能为空"
-        Case Is = 530 : errorReason = "第九项 未填写肝肾功能"
-        Case Is = 531 : errorReason = "第九项 尿糖为空"
-        Case Is = 532 : errorReason = "第九项 未填写尿糖"
-        Case Is = 533 : errorReason = "第九项 尿蛋白为空"
-        Case Is = 534 : errorReason = "第九项 未填写尿蛋白"
-        Case Is = 535 : errorReason = "第九项 C肽为空"
-        Case Is = 536 : errorReason = "第九项 未填写C肽"
+        'Case Is = 529 : errorReason = "第九项 肝肾功能为空"
+        'Case Is = 530 : errorReason = "第九项 未填写肝肾功能"
+        'Case Is = 531 : errorReason = "第九项 尿糖为空"
+        'Case Is = 532 : errorReason = "第九项 未填写尿糖"
+        'Case Is = 533 : errorReason = "第九项 尿蛋白为空"
+        'Case Is = 534 : errorReason = "第九项 未填写尿蛋白"
+        'Case Is = 535 : errorReason = "第九项 C肽为空"
+        Case Is = 536 : errorReason = "第九项 未填写 C肽"
         Case Is = 537 : errorReason = "第十项 糖尿病类型为空"
         Case Is = 538 : errorReason = "第十项 未选择糖尿病类型"
-        Case Is = 539 : errorReason = "第十项 并发症(第32行) 填写了无，却选择了疾病"
-        Case Is = 540 : errorReason = "第十项 并发症(第32行) 选择了类型，未选择疾病"
-        Case Is = 541 : errorReason = "第十项 并发症(第32行) 类型与疾病不匹配"
-        Case Is = 542 : errorReason = "第十项 并发症(第33行) 填写了无，却选择了疾病"
-        Case Is = 543 : errorReason = "第十项 并发症(第33行) 选择了类型，未选择疾病"
-        Case Is = 544 : errorReason = "第十项 并发症(第33行) 类型与疾病不匹配"
-        Case Is = 545 : errorReason = "第十项 并发症(第34行) 填写了无，却选择了疾病"
-        Case Is = 546 : errorReason = "第十项 并发症(第34行) 选择了类型，未选择疾病"
-        Case Is = 547 : errorReason = "第十项 并发症(第34行) 类型与疾病不匹配"
+        'Case Is = 539 : errorReason = "第十项 并发症(第32行) 填写了无，却选择了疾病"
+        'Case Is = 540 : errorReason = "第十项 并发症(第32行) 选择了类型，未选择疾病"
+        'Case Is = 541 : errorReason = "第十项 并发症(第32行) 类型与疾病不匹配"
+        'Case Is = 542 : errorReason = "第十项 并发症(第33行) 填写了无，却选择了疾病"
+        'Case Is = 543 : errorReason = "第十项 并发症(第33行) 选择了类型，未选择疾病"
+        'Case Is = 544 : errorReason = "第十项 并发症(第33行) 类型与疾病不匹配"
+        'Case Is = 545 : errorReason = "第十项 并发症(第34行) 填写了无，却选择了疾病"
+        'Case Is = 546 : errorReason = "第十项 并发症(第34行) 选择了类型，未选择疾病"
+        'Case Is = 547 : errorReason = "第十项 并发症(第34行) 类型与疾病不匹配"
         Case Is = 548 : errorReason = "第十一项 胰岛素治疗：没填写方案却填写了药物"
         Case Is = 549 : errorReason = "第十一项 胰岛素治疗：没填写方案却填写了剂量"
-        Case Is = 550 : errorReason = "第十一项 住院期间用药都是未使用"
-        Case Is = 551 : errorReason = "第十一项 住院期间未接受胰岛素治疗"
+        'Case Is = 550 : errorReason = "第十一项 住院期间用药都是未使用"
+        'Case Is = 551 : errorReason = "第十一项 住院期间未接受胰岛素治疗"
         Case Is = 552 : errorReason = "第十一项 胰岛素治疗：填写了方案却没填写药物"
         Case Is = 553 : errorReason = "第十一项 胰岛素治疗：方案与药物不匹配"
-        Case Is = 554 : errorReason = "第十一项 早剂量为空"
-        Case Is = 555 : errorReason = "第十一项 未填写早剂量"
-        Case Is = 556 : errorReason = "第十一项 中剂量为空"
-        Case Is = 557 : errorReason = "第十一项 未填写中剂量"
-        Case Is = 558 : errorReason = "第十一项 晚剂量为空"
-        Case Is = 559 : errorReason = "第十一项 未填写晚剂量"
-        Case Is = 560 : errorReason = "第十一项 睡前剂量为空"
-        Case Is = 561 : errorReason = "第十一项 未填写睡前剂量"
+        Case Is = 554 : errorReason = "第十一项 方案选择强化治疗 而填写的剂量次数小于4"
+        Case Is = 555 : errorReason = "第十一项 方案选择的针数与后面填写的剂量次数不一致"
+        ' Case Is = 556 : errorReason = "第十一项 中剂量为空"
+        ' Case Is = 557 : errorReason = "第十一项 未填写中剂量"
+        ' Case Is = 558 : errorReason = "第十一项 晚剂量为空"
+        ' Case Is = 559 : errorReason = "第十一项 未填写晚剂量"
+        ' Case Is = 560 : errorReason = "第十一项 睡前剂量为空"
+        ' Case Is = 561 : errorReason = "第十一项 未填写睡前剂量"
         Case Is = 562 : errorReason = "第十二项 强化方案前 空腹血糖 为空"
         Case Is = 563 : errorReason = "第十二项 强化方案前 空腹血糖 未填写"
         Case Is = 564 : errorReason = "第十二项 强化方案前 早餐后血糖 为空"
@@ -913,9 +853,9 @@ For Each errorNumb In errorBox
         Case Is = 617 : errorReason = "第十二项 转预混后 睡前血糖 未填写"
         Case Is = 618 : errorReason = "第十一项选择了强化治疗，而第十三项方案 为空"
         Case Is = 619 : errorReason = "第十一项选择了强化治疗，而第十三项方案 未填写"
-        Case Is = 620 : errorReason = "第十三项 选择了强化方案却没填写 早晨 胰岛素剂量"
-        Case Is = 621 : errorReason = "第十三项 选择了强化方案却没填写 中午 胰岛素剂量"
-        Case Is = 622 : errorReason = "第十三项 选择了强化方案却没填写 晚上 胰岛素剂量"
+        
+        Case Is = 620 : errorReason = "第十三项 选择方案的针数与后面填写的剂量次数不一致"
+       
         Case Is = 623 : errorReason = "第十四项 出院空腹血糖 未填写"
         Case Is = 624 : errorReason = "第十四项 出院早餐后血糖 未填写"
         Case Is = 625 : errorReason = "第十四项 出院午餐前血糖 未填写"
@@ -929,7 +869,7 @@ For Each errorNumb In errorBox
         Case Is = 1000: errorReason = "病例使用的第一期模板"
         Case Is = 1001: errorReason = "病例很可能是第一期模板"    
     End Select
-    '【TODO】让错误原因在单元格内换行，并拉伸行高，最好错误给出序号
+
     sht.Cells(LastRow + 1, 2) = sht.Cells(LastRow + 1, 2) & errorNumb & vbcrlf
     sht.Cells(LastRow + 1, 3) = sht.Cells(LastRow + 1, 3) & i &". " & errorReason & vbcrlf
     '【TODO】写出修改的地方
@@ -937,6 +877,9 @@ For Each errorNumb In errorBox
     '【TODO】病例重复性检验
 Next
 
+'【TODO】设置字体字号为：
+
+'【TODO】检查处理后的文件数量与行数
 Set errorBox = Nothing
 Set sht = Nothing
 ActiveWorkbook.Save
