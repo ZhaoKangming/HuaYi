@@ -1,7 +1,7 @@
 '宏作用：将每行的内容自动识别制表，生成工作周报与邮件内容
 
 Sub Generate_WorkReport()
-    Dim FirstDay$, LastDay$
+    Dim FirstDay$, LastDay$, NewReportName$
     LastDay = Format(Date, "mmdd")
     FirstDay = Format(Date - 6, "mmdd") 
   
@@ -17,6 +17,13 @@ Sub Generate_WorkReport()
 
 '【TODO】收尾工作：删除临时xlsx工作表
   ThisWorkbook.save
+    
+  NewReportName = "【WorkReport】" & FirstDay & "-" & LastDay & "-ZKM.xlsx"
+  Sheets("Temp").Copy
+  ChDir "C:\Users\JokeComing\Desktop"
+  ActiveWorkbook.SaveAs Filename:="C:\Users\JokeComing\Desktop\" & NewReportName, _
+      FileFormat:=xlOpenXMLWorkbook, CreateBackup:=False
+  Windows("【WorkReport】2019.xlsm").Activate
   Msgbox "已经生成工作周报！"
 
 End Sub
