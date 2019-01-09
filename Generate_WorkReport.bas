@@ -1,9 +1,18 @@
 '宏作用：将每行的内容自动识别制表，生成工作周报与邮件内容
 
 Sub Generate_WorkReport()
-    Dim FirstDay$, LastDay$, NewReportName$
+    Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
     LastDay = Format(Date, "mmdd")
     FirstDay = Format(Date - 6, "mmdd") 
+    
+    set StartCell = Sheet("Temp").[A:A].Find(What:="start")
+   
+'If findwt = Nothing Then
+    'MsgBox "no"
+'Else
+   ' MsgBox "yes"
+'End If
+    
   
 '【TODO】格式处理：自动调整格式，比如说全边框，粗体自动变颜色，自动生成首列时间等，未完成的，正在进行中的进行标注
 
