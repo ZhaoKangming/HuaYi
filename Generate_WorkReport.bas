@@ -5,15 +5,12 @@ Sub Generate_WorkReport()
     LastDay = Format(Date, "mmdd")
     FirstDay = Format(Date - 6, "mmdd") 
     
-    set StartCell = Sheet("Temp").[A:A].Find(What:="start")
-   
-'If findwt = Nothing Then
-    'MsgBox "no"
-'Else
-   ' MsgBox "yes"
-'End If
-    
-  
+    Set StartCell = Sheet("Temp").[A:A].Find(What:="start")
+    If StartCell is Nothing Then
+        MsgBox "没找到启动标志：start！"
+        Exit Sub
+    End if
+        
 '【TODO】格式处理：自动调整格式，比如说全边框，粗体自动变颜色，自动生成首列时间等，未完成的，正在进行中的进行标注
 
 '【TODO】生成图表：根据时间比例自动分配图表
