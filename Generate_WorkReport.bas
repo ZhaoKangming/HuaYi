@@ -31,5 +31,35 @@ Sub Generate_WorkReport()
       FileFormat:=xlOpenXMLWorkbook, CreateBackup:=False
   Windows("【WorkReport】2019.xlsm").Activate
   Msgbox "已经生成工作周报！"
+    Call Generate_EmailContent
+End Sub
 
+Sub Generate_EmailContent
+    Dim Wordapp As Word.Application
+    Set Wordapp = New Word.Application
+    Wordapp.Visible = True
+    'Wordapp.ScreenUpdating = False
+    Dim WordD As Word.Document
+    Set WordD = Wordapp.Documents.Add
+    ActiveDocument.Save
+    ChangeFileOpenDirectory "C:\Users\JokeComing\Desktop\"
+    ActiveDocument.SaveAs2 Filename:="【WR】邮件内容.docx", FileFormat:= _
+    wdFormatXMLDocument, LockComments:=False, Password:="", AddToRecentFiles _
+        :=True, WritePassword:="", ReadOnlyRecommended:=False, EmbedTrueTypeFonts _
+        :=False, SaveNativePictureFormat:=False, SaveFormsData:=False, _
+        SaveAsAOCELetter:=False, CompatibilityMode:=15
+    
+'Documents("【WR】邮件内容.docx").Activate
+Set rngFormat = ActiveDocument.Range(Start:=0, End:=0)
+
+With rngFormat
+    .InsertAfter Text:="翟姐："
+    .InsertParagraphAfter
+    .InsertAfter Text:=vbTab & "这是我本周的工作内容概要：" & vbTab
+    '.TypeParagraph
+    '.TypeText Text:=vbTab & "1. 诺和诺德"
+    .Font.Name = "微软雅黑"
+    .Font.Size = 12
+End With
+    MsgBox "已经生成邮件内容！"
 End Sub
