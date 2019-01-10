@@ -10,7 +10,11 @@ Sub Generate_WorkReport()
         MsgBox "没找到启动标志：start！"
         Exit Sub
     End if
+'【TODO】从TXT中导入内容？
         
+'【TODO】复制模板表，还是单独设置行距？
+        
+  [A3] = Format(Date - 6, "yyyy.mm.dd")  & vbcrlf & "~" & vbcrlf & Format(Date, "yyyy.mm.dd")
 '【TODO】格式处理：自动调整格式，比如说全边框，粗体自动变颜色，自动生成首列时间等，未完成的，正在进行中的进行标注
 
 '【TODO】生成图表：根据时间比例自动分配图表
