@@ -5,6 +5,8 @@ Dim shtsNumb%, errorNumb, errorReason$, i%,j%, caseName$, standardName$, LastRow
 Dim contentFilled$, tempValue%, doctorName$, tempName$, hospitalName$, serialNumb$, reg, FindWords, ACell
 Dim sht As Worksheet, rng As Range, errorBox As New Collection, workPath$, bmiCalc$, bmiFilled$
 
+    '【TODO】用Scripting.Dictionary 代替Collection ？   
+
 errorNumb = 0
 '激活病例的工作簿，并获取病例名字
 For i = 1 To Workbooks.Count
