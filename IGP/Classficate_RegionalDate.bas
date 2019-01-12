@@ -6,9 +6,10 @@ Sub ReportAutofilter()
   Do Until dt <> ""
     dt = InputBox("请输入数据截止日期，例如：20181102", "输入日期")
   Loop
-Debug.Print dt
 Application.ScreenUpdating = False
 
+  【todo】for next  
+ 
 ms = "华北大区报告审核结果" & dt & ".xlsx"
 Set wb = Workbooks.Add
 wb.SaveAs "C:\Users\caiji\Desktop\报告审核结果\" & ms
