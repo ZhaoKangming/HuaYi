@@ -1,15 +1,12 @@
 Sub ReportAutofilter()
-  Dim rng As Range
-  Dim wb As Workbook
-  Dim sht As Worksheet
-  Dim dt$, ms$
+  Dim rng As Range, wb As Workbook, sht As Worksheet, dt$, ms$
   Do Until dt <> ""
     dt = InputBox("请输入数据截止日期，例如：20181102", "输入日期")
   Loop
 Application.ScreenUpdating = False
 
   【todo】for next  
- 
+'设置变量替代工作簿名，减少原名出现次数 
 ms = "华北大区报告审核结果" & dt & ".xlsx"
 Set wb = Workbooks.Add
 wb.SaveAs "C:\Users\caiji\Desktop\报告审核结果\" & ms
