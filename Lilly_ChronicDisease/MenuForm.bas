@@ -30,6 +30,7 @@ Public Sub GetCaseList_Click()
             Do While Myfile <> ""
                 If Myfile <> "." And Myfile <> ".." Then
                     If j > i Then
+                        '插入新行
                         Rows(j).Insert Shift:=xlDown, CopyOrigin:=xlFormatFromLeftOrAbove
                         Cells(j, 2) = Cells(i, 2)
                         Cells(j, 3) = Cells(i, 3)
