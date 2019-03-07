@@ -1,5 +1,23 @@
 '宏作用：将每行的内容自动识别制表，生成工作周报与邮件内容
 
+Sub ReadTxt()
+    Dim a, b, i%, j%, r&
+    TxtPath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\桌面\Work_Logs.txt"
+    Open TxtPath For Input As #1
+    a = Split(StrConv(InputB(LOF(1), 1), vbUnicode), vbCrLf)
+    Close #1
+
+    For i = 0 To UBound(a)
+        b = Split(a(i), " ")
+        For j = 0 To UBound(b)
+            Worksheets("ZKM").Cells(i + 2, j + 1) = b(j)
+        Next
+    Next
+    MsgBox ("文件读取完成!")
+    
+End Sub
+
+
 Sub Generate_WorkReport()
     Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
     LastDay = Format(Date, "mmdd")
