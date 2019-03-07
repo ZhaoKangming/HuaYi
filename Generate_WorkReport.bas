@@ -1,4 +1,14 @@
 '宏作用：将每行的内容自动识别制表，生成工作周报与邮件内容
+Sub Generate_WorkReport()
+    Application.ScreenUpdating = False
+    Call ReadTxt
+    Call DelBlankRows
+
+    ThisWorkbook.Save
+    Application.ScreenUpdating = True
+    Msgbox "已经生成报告！"
+End Sub
+
 
 Sub ReadTxt()
     Dim a, b, i%, j%, r&
@@ -10,15 +20,17 @@ Sub ReadTxt()
     For i = 0 To UBound(a)
         b = Split(a(i), " ")
         For j = 0 To UBound(b)
-            Worksheets("ZKM").Cells(i + 2, j + 1) = b(j)
+            Worksheets("work").Cells(i + 2, j + 1) = b(j)
         Next
     Next
-    MsgBox ("文件读取完成!")
+End Sub
+
+Sub DelBlankRows()
+    Dim 
+
     
 End Sub
 
-
-Sub Generate_WorkReport()
     Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
     LastDay = Format(Date, "mmdd")
     FirstDay = Format(Date - 6, "mmdd") 
@@ -28,11 +40,10 @@ Sub Generate_WorkReport()
         MsgBox "没找到启动标志：start！"
         Exit Sub
     End if
-'【TODO】从TXT中导入内容？
         
 '【TODO】复制模板表，还是单独设置行距？
         
-  [A3] = Format(Date - 6, "yyyy.mm.dd")  & vbcrlf & "~" & vbcrlf & Format(Date, "yyyy.mm.dd")
+    [A3] = Format(Date - 6, "yyyy.mm.dd")  & vbcrlf & "~" & vbcrlf & Format(Date, "yyyy.mm.dd")
 '【TODO】格式处理：自动调整格式，比如说全边框，粗体自动变颜色，自动生成首列时间等，未完成的，正在进行中的进行标注
 
 '【TODO】生成图表：根据时间比例自动分配图表
