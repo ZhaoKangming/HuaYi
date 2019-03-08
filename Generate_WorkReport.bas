@@ -1,8 +1,9 @@
 '宏作用：将每行的内容自动识别制表，生成工作周报与邮件内容
 Sub Generate_WorkReport()
     Application.ScreenUpdating = False
-    Call ReadTxt
-    Call DelBlankRows
+    Call Read_Txt
+    Call Del_Blank_Rows
+    Call Order_Items
 
     ThisWorkbook.Save
     Application.ScreenUpdating = True
@@ -10,7 +11,7 @@ Sub Generate_WorkReport()
 End Sub
 
 
-Sub ReadTxt()
+Sub Read_Txt()
     Dim a, b, i%, j%, r&
     TxtPath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\桌面\Work_Logs.txt"
     Open TxtPath For Input As #1
@@ -20,16 +21,34 @@ Sub ReadTxt()
     For i = 0 To UBound(a)
         b = Split(a(i), " ")
         For j = 0 To UBound(b)
-            Worksheets("work").Cells(i + 2, j + 1) = b(j)
+            Worksheets("work").Cells(i + 1, j + 1) = b(j)
         Next
     Next
 End Sub
 
-Sub DelBlankRows()
-    Dim 
-
-    
+Sub Del_Blank_Rows()
+    Dim i%, RowsNumb%
+    RowsNumb = [a10000].End(xlUp).Row
+    For i = RowsNumb To 1 Step -1
+        If Trim(Cells(i,1)) = "" and Trim(Cells(i,1)) = "" Then
+            Rows(i).EntireRow.Delete
+        End If
+    Next i
 End Sub
+
+Sub Order_Items()
+    Dim CRrow%, WRrow%, SSrow%, SErow%
+End Sub
+
+Sub Complete_Project_Names()
+    With Sheets("work").usedrange.Cells
+        .Replace "fn","诺和-赋能起航"
+        .Replace "pk","杨森-皮科好医生"
+        .Replace "qt","其他"
+    End With
+End Sub
+
+
 
     Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
     LastDay = Format(Date, "mmdd")
