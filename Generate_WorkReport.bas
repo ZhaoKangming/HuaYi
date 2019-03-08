@@ -38,6 +38,11 @@ End Sub
 
 Sub Order_Items()
     Dim CRrow%, WRrow%, SSrow%, SErow%
+    CRrow = Sheets("work").Range("A:A").Find("【客服记录】").Row
+    WRrow = Sheets("work").Range("A:A").Find("【工作内容】").Row
+    SSrow = Sheets("work").Range("A:A").Find("[-").Row
+    SErow = Sheets("work").Range("A:A").Find("-]").Row
+
 End Sub
 
 Sub Complete_Project_Names()
@@ -45,10 +50,11 @@ Sub Complete_Project_Names()
         .Replace "fn","诺和-赋能起航"
         .Replace "pk","杨森-皮科好医生"
         .Replace "qt","其他"
+        .Replace "ig","诺和-IGP2.0"
     End With
 End Sub
 
-
+' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
 
     Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
     LastDay = Format(Date, "mmdd")
