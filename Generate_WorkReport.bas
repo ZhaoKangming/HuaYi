@@ -4,7 +4,7 @@ Sub Generate_WorkReport()
     Call Read_Txt
     Call Del_Blank_Rows
     Call Order_Items
-    Call
+    Call Adjust_Format
     Call
     Call
 
@@ -39,21 +39,25 @@ Sub Del_Blank_Rows()
 End Sub
 
 Sub Order_Items()
-    Dim CRrow%, WRrow%, SSrow%, SErow%
+    Dim CRrow%, FNrow%, PKrow%, SSrow%, SErow%,
     CRrow = Sheets("work").Range("A:A").Find("【客服记录】").Row
-    WRrow = Sheets("work").Range("A:A").Find("【工作内容】").Row
+    FNrow = Sheets("work").Range("A:A").Find("【赋能起航】").Row
+    PKrow = Sheets("work").Range("A:A").Find("【皮科好医生】").Row
     SSrow = Sheets("work").Range("A:A").Find("[-").Row
     SErow = Sheets("work").Range("A:A").Find("-]").Row
 
 End Sub
 
-Sub Complete_Project_Names()
-    With Sheets("work").usedrange.Cells
-        .Replace "fn","诺和-赋能起航"
-        .Replace "pk","杨森-皮科好医生"
-        .Replace "qt","其他"
-        .Replace "ig","诺和-IGP2.0"
-    End With
+Sub Adjust_Format()
+    Dim i%, RowsNumb%, ColonPosition%
+    RowsNumb = [a10000].End(xlUp).Row
+    For i = 1 to RowsNumb
+        If Left(Cells(i,1)) = "#" Then
+            Cells(i,1).Replace "#",""
+            ColonPosition = Application.WorksheetFunction.Find("：",Cells(i,1),1)
+            Cells(i,1) .Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
+        End if
+        If Left(Cells(i,1)) = "@" Then Cells(i,1).Replace "@","        "
 End Sub
 
 ' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
