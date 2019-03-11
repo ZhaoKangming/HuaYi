@@ -2,9 +2,8 @@ Sub CountNumbs()
     Application.ScreenUpdating = False
     Call DateClean
     Call GetList
-
+    Call GetNumbs
     Call Beautify
-
     ThisWorkbook.Save
     Application.ScreenUpdating = True
     MsgBox "Finished！"
@@ -34,6 +33,11 @@ Sub Beautify()
         .Font.Size = 12    
     End With
 
+    With Sheets("Sheet2").UsedRange
+        .Font.Name = "微软雅黑"
+        .Font.Size = 12    
+    End With
+
     Sheets("Sheet3").Delete
 End Sub
 
@@ -49,21 +53,51 @@ Sub GetFrequency(ValueRange As Range,StartCell As Range)
     For i = 0 To d.Count - 1
         Cells(i + SCRow, StartCell.Column) = arr(i)
     Next
+    Set d = Nothing
 End Sub
 
 Sub GetList()
-    Dim RowsNumb%, i%, CitiesNumb%
+    Dim RowsNumb%, i%, CitiesNumb%, ProvienceRows%, ProvienceRng As Range, ProFirstRow%
+    Dim GetF_VR As Range, GetF_SC As Range, cellrng As Range, dict As Object
+    Sheets("Sheet2").[A1] = "省份"
+    Sheets("Sheet2").[B1] = "城市"
+    Sheets("Sheet2").[C1] = "医生"
+    Sheets("Sheet2").[D1] = "护士"
+    Sheets("Sheet2").[E1] = "技师"
+    Sheets("Sheet2").[F1] = "药师"
     RowsNumb = Sheets("Sheet1").[a99999].End(xlUp).Row
-    Call GetFrequency(Sheets("Sheet1").Range([A2], Cells(RowsNumb, 1)),Sheets("Sheet2").[A2])
+    ProvienceRng = Sheets("Sheet1").Range([A2], Cells(RowsNumb, 1))
 
-    For i = 2 to Sheets("Sheet2").[a99999].End(xlUp).Row
+    Set dict = CreateObject("scripting.dictionary")
+    For Each cellrng In Sheets("Sheet1").Range([B2], Cells(RowsNumb, 2))
+        If cellrng <> "" And Not dict.exists(cellrng.Value) Then dict(cellrng.Value)= cellrng.Value
+    Next
+    CitiesNumb = dict.Count
+    Set dict = Nothing
+    Call GetFrequency(ProvienceRng,Sheets("Sheet2").[A2])
 
+    For i = 2 to CitiesNumb + 1
+        If Sheets("Sheet2").Cells(i,1) <> "" Then
+            ProvienceRows = Application.WorksheetFunction.Countif(ProvienceRng,Sheets("Sheet2").Cells(i,1)) 
+            ProFirstRow = ProvienceRng.Find(Sheets("Sheet2").Cells(i,1)).Row
+            GetF_VR = Sheets("Sheet1").Range(Cells(ProFirstRow,2), Cells(ProFirstRow + ProvienceRows - 1, 2))
+            GetF_SC = Sheets("Sheet2").Cells(i,2)
+            Call GetFrequency(GetF_VR,GetF_SC)
+        End If
+    Next
+End Sub
+
+Sub GetNumbs()
+    Dim Arr, i%
+    Arr = Array("中医主管护师","中医护师","中医护士","中医副主任护师","副主任护师","主任护师","主管护师","护师", _
+    "护士","见习护士","见习护师","护师（新晋）","中医主任护师")
+    For i = 0 To UBound(Arr)
+        Debug.Print Arr(i)
+
+　　Next
 
 End Sub
 
 
 
 
-
-
-    
