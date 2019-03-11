@@ -39,13 +39,24 @@ Sub Del_Blank_Rows()
 End Sub
 
 Sub Order_Items()
-    Dim CRrow%, FNrow%, PKrow%, SSrow%, SErow%,
+    Dim CRrow%, FNrow%, PKrow%, QTrow%, SSrow%, SErow%,
     CRrow = Sheets("work").Range("A:A").Find("【客服记录】").Row
-    FNrow = Sheets("work").Range("A:A").Find("【赋能起航】").Row
     PKrow = Sheets("work").Range("A:A").Find("【皮科好医生】").Row
+    FNrow = Sheets("work").Range("A:A").Find("【赋能起航】").Row
+    QTrow = Sheets("work").Range("A:A").Find("【其他工作】").Row
     SSrow = Sheets("work").Range("A:A").Find("[-").Row
     SErow = Sheets("work").Range("A:A").Find("-]").Row
 
+    ' 完善客服记录中的项目名称
+    With Rows(CRrow + 1 & ":" & PKrow - 1)
+        .Replace "fn","赋能起航"
+        .Replace "pk","皮科好医生"
+        .Replace "mb","礼来慢病"
+        .Replace "ig","IGP2.0"
+    End With
+
+
+    ' 【TODO】如果某一个项目本周没有工作就删除此项
 End Sub
 
 Sub Adjust_Format()
@@ -66,11 +77,6 @@ Sub Get_Date()
     LastDay = Format(Date, "mmdd")
     FirstDay = Format(Date - 6, "mmdd") 
     
-    Set StartCell = Sheet("Temp").[A:A].Find(What:="start")
-    If StartCell is Nothing Then
-        MsgBox "没找到启动标志：start！"
-        Exit Sub
-    End if
 End Sub
 '【TODO】复制模板表，还是单独设置行距？
 
