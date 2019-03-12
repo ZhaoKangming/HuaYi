@@ -10,6 +10,7 @@ Sub Generate_WorkReport()
     Call Del_Blank_Rows
     Call Order_Items
     Call Adjust_Format
+    Call New_Wkbook
     Call Copy_Data
     Call
 
@@ -79,24 +80,37 @@ Sub Adjust_Format()
         If Left(Cells(i,1)) = "#" Then Cells(i,1).Replace "#","        "
 End Sub
 
+Sub New_Wkbook()
+    Dim FirstDay$, LastDay$, NewReportName$, FilePath$, DateRange$
+    LastDay = Format(Date, "yymmdd")
+    FirstDay = Format(Date - 6, "yymmdd")  
+
+    FilePath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\桌面\【WorkReport】" & FirstDay & "-" & LastDay & "-ZKM.xlsx"   
+    Workbooks.Add
+    ActiveWorkbook.SaveAs FilePath, True
+
+    Workbooks("WorkReport_Maker.xlsm").Sheets("WorkReport").Copy before:=ActiveWorkbook.Sheets("Sheet1")
+    Workbooks("WorkReport_Maker.xlsm").Sheets("CallRecords").Copy before:=ActiveWorkbook.Sheets("Sheet1")
+
+    DateRange = Format(Date - 6, "yyyy""年""mm""月""dd日") & "-" & Format(Date, "yyyy""年""mm""月""dd日")
+    Sheets("WorkReport").Cells(2,6) = DateRange
+    Sheets("CallRecords").Cells(2,7) = DateRange
+End Sub
+
 Sub Copy_Data()
 
+    
 
 End Sub
 
 ' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
-Sub Get_Date()
-    Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
-    LastDay = Format(Date, "yymmdd")
-    FirstDay = Format(Date - 6, "yymmdd")     
 
-    Cells(,) = Format(Date - 6, "yyyy""年""mm""月""dd日") & "" & Format(Date, "yyyy""年""mm""月""dd日")
-End Sub
+
 '【TODO】复制模板表，还是单独设置行距？
 '【TODO】格式处理：自动调整格式，比如说全边框，未完成的，正在进行中的进行标注
-'【TODO】生成文件：在新建一个临时xlsx文件，并将当前表复制到其中，保持列宽，填充色等不变
 '【TODO】生成概要：生成工作周报总结，方便放置到邮件正文中
-'【TODO】收尾工作：删除临时xlsx工作表
+
+'【TODO】把本周的工作周报合并汇总到总表中
 
 NewReportName = "【WorkReport】" & FirstDay & "-" & LastDay & "-ZKM.xlsx"
 Sheets("Temp").Copy
