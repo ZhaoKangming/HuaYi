@@ -2,6 +2,7 @@ Sub CountNumbs()
     Application.ScreenUpdating = False
     Call DateClean
     Call GetList
+    Call DocTitle
     Call GetNumbs
     Call Beautify
     ThisWorkbook.Save
@@ -25,22 +26,6 @@ Sub DateClean()
     'MsgBox "Date have been cleaned!"
 End Sub
 
-
-Sub Beautify()
-
-    With Sheets("Sheet1").UsedRange
-        .Font.Name = "微软雅黑"
-        .Font.Size = 12    
-    End With
-
-    With Sheets("Sheet2").UsedRange
-        .Font.Name = "微软雅黑"
-        .Font.Size = 12    
-    End With
-
-    Sheets("Sheet3").Delete
-End Sub
-
 Sub GetFrequency(ValueRange As Range,StartCell As Range)
     Dim rng As Range, arr, d As Object, i%, SCRow%
     Set d = CreateObject("scripting.dictionary")
@@ -61,7 +46,7 @@ Sub GetList()
     Dim GetF_VR As Range, GetF_SC As Range, cellrng As Range, dict As Object
     Sheets("Sheet2").[A1] = "省份"
     Sheets("Sheet2").[B1] = "城市"
-    Sheets("Sheet2").[C1] = "医生"
+    Sheets("Sheet2").[C1] = "医师"
     Sheets("Sheet2").[D1] = "护士"
     Sheets("Sheet2").[E1] = "技师"
     Sheets("Sheet2").[F1] = "药师"
@@ -87,21 +72,75 @@ Sub GetList()
     Next
 End Sub
 
-Sub GetNumbs()
-    Dim Arr, i%
-    Arr = Array("中医主管护师","中医护师","中医护士","中医副主任护师","副主任护师","主任护师","主管护师","护师", _
-                "护士","见习护士","见习护师","护师（新晋）","中医主任护师")
-    Arr = Array("药具士","主管药具师","副主任药师","主任药师","药剂士","药剂师","主管药师","中医副主任药师","中医 _
+Sub DocTitle()
+    Dim HuShiArr, YaoShiArr, JiShiArr, RowsNumb%, i%, j%, ConfirmDocTitle As Boolean
+    HuShiArr = Array("护士","见习护士","见习护师","中医护士","中医副主任护师","副主任护师","主任护师","主管护师","护师", _
+                "中医主管护师","中医护师","护师（新晋）","中医主任护师")
+    YaoShiArr = Array("药具士","主管药具师","副主任药师","主任药师","药剂士","药剂师","主管药师","中医副主任药师","中医 _
                 主任药师","中医主管药师","中医药士","中医药师","见习药剂士","见习药剂师","主管药师（新晋）","药具师")
-    Arr = Array("技师","主管技师","主任技师","副主任技师","见习技师","中医技师","中医主任技师","中医主管技师", _
+    JiShiArr = Array("技师","主管技师","主任技师","副主任技师","见习技师","中医技师","中医主任技师","中医主管技师", _
                 "中医副主任技师","主管技师（新晋）")
-    For i = 0 To UBound(Arr)
-        Debug.Print Arr(i)
+    RowsNumb = Sheets("Sheet1").[a99999].End(xlUp).Row
+    For i = 2 to RowsNumb
+        ConfirmDocTitle = False
+        If Cells(i,6) Like "*医师*" Then
+            Cells(i,10) = "医生"
+            ConfirmDocTitle = True
+        End if
 
-　　Next
+        If ConfirmDocTitle = False Then
+            For j = 0 To UBound(HuShiArr)
+                If Cells(i,6) = HuShiArr(j) Then 
+                    Cells(i,10) = "护士"
+                    ConfirmDocTitle = True
+                    Exit For
+                End If
+            Next j
+        End If
+
+        If ConfirmDocTitle = False Then
+            For j = 0 To UBound(YaoShiArr)
+                If Cells(i,6) = YaoShiArr(j) Then 
+                    Cells(i,10) = "药师"
+                    ConfirmDocTitle = True
+                    Exit For
+                End If
+            Next j
+        End If
+
+        If ConfirmDocTitle = False Then
+            For j = 0 To UBound(JiShiArr)
+                If Cells(i,6) = JiShiArr(j) Then 
+                    Cells(i,10) = "技师"
+                    ConfirmDocTitle = True
+                    Exit For
+                End If
+            Next j
+        End If
+
+        If ConfirmDocTitle = False Then Cells(i,10) = "医师"
+    Next
+End Sub
+
+Sub GetNumbs()
+
 
 End Sub
 
 
+Sub Beautify()
+
+    With Sheets("Sheet1").UsedRange
+        .Font.Name = "微软雅黑"
+        .Font.Size = 12    
+    End With
+
+    With Sheets("Sheet2").UsedRange
+        .Font.Name = "微软雅黑"
+        .Font.Size = 12    
+    End With
+
+    Sheets("Sheet3").Delete
+End Sub
 
 
