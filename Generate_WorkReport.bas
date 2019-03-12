@@ -1,4 +1,9 @@
 '宏作用：将每行的内容自动识别制表，生成工作周报与邮件内容
+'内容识别规则：
+' [1]内容大块分区，由上至下分别是【客服记录】、【皮科好医生】、【赋能起航】、【其他工作】
+' [2]工作类别：以 @ 开头，一般后面会有一个中文冒号，后面内容为详情或说明
+' [3]工作详情：以 # 开头，放到
+
 Sub Generate_WorkReport()
     Application.ScreenUpdating = False
     Call Read_Txt
@@ -39,13 +44,14 @@ Sub Del_Blank_Rows()
 End Sub
 
 Sub Order_Items()
-    Dim CRrow%, FNrow%, PKrow%, QTrow%, SSrow%, SErow%,
+    Dim CRrow%, FNrow%, PKrow%, QTrow%
+    ' Dim SSrow%, SErow%,
     CRrow = Sheets("work").Range("A:A").Find("【客服记录】").Row
     PKrow = Sheets("work").Range("A:A").Find("【皮科好医生】").Row
     FNrow = Sheets("work").Range("A:A").Find("【赋能起航】").Row
     QTrow = Sheets("work").Range("A:A").Find("【其他工作】").Row
-    SSrow = Sheets("work").Range("A:A").Find("[-").Row
-    SErow = Sheets("work").Range("A:A").Find("-]").Row
+    ' SSrow = Sheets("work").Range("A:A").Find("[-").Row
+    ' SErow = Sheets("work").Range("A:A").Find("-]").Row
 
     ' 完善客服记录中的项目名称
     With Rows(CRrow + 1 & ":" & PKrow - 1)
@@ -65,12 +71,12 @@ Sub Adjust_Format()
     Dim i%, RowsNumb%, ColonPosition%
     RowsNumb = [a10000].End(xlUp).Row
     For i = 1 to RowsNumb
-        If Left(Cells(i,1)) = "#" Then
-            Cells(i,1).Replace "#",""
+        If Left(Cells(i,1)) = "@" Then
+            Cells(i,1).Replace "@",""
             ColonPosition = Application.WorksheetFunction.Find("：",Cells(i,1),1)
             Cells(i,1) .Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
         End if
-        If Left(Cells(i,1)) = "@" Then Cells(i,1).Replace "@","        "
+        If Left(Cells(i,1)) = "#" Then Cells(i,1).Replace "#","        "
 End Sub
 
 Sub Copy_Data()
@@ -81,15 +87,13 @@ End Sub
 ' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
 Sub Get_Date()
     Dim FirstDay$, LastDay$, NewReportName$, StartCell as Range
-    LastDay = Format(Date, "mmdd")
-    FirstDay = Format(Date - 6, "mmdd") 
-    
+    LastDay = Format(Date, "yymmdd")
+    FirstDay = Format(Date - 6, "yymmdd")     
+
+    Cells(,) = Format(Date - 6, "yyyy""年""mm""月""dd日") & "" & Format(Date, "yyyy""年""mm""月""dd日")
 End Sub
 '【TODO】复制模板表，还是单独设置行距？
-
-[A3] = Format(Date - 6, "yyyy.mm.dd")  & vbcrlf & "~" & vbcrlf & Format(Date, "yyyy.mm.dd")
-'【TODO】格式处理：自动调整格式，比如说全边框，粗体自动变颜色，自动生成首列时间等，未完成的，正在进行中的进行标注
-'【TODO】生成图表：根据时间比例自动分配图表
+'【TODO】格式处理：自动调整格式，比如说全边框，未完成的，正在进行中的进行标注
 '【TODO】生成文件：在新建一个临时xlsx文件，并将当前表复制到其中，保持列宽，填充色等不变
 '【TODO】生成概要：生成工作周报总结，方便放置到邮件正文中
 '【TODO】收尾工作：删除临时xlsx工作表
