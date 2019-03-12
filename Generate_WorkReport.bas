@@ -5,7 +5,7 @@ Sub Generate_WorkReport()
     Call Del_Blank_Rows
     Call Order_Items
     Call Adjust_Format
-    Call
+    Call Copy_Data
     Call
 
     ThisWorkbook.Save
@@ -55,8 +55,10 @@ Sub Order_Items()
         .Replace "ig","IGP2.0"
     End With
 
-
     ' 【TODO】如果某一个项目本周没有工作就删除此项
+    If CRrow - PKrow = 1 Then Rows(CRrow).Delete
+    If FNrow - PKrow = 1 Then Rows(PKrow).Delete
+    If QTrow - FNrow = 1 Then Rows(FNrow).Delete
 End Sub
 
 Sub Adjust_Format()
@@ -69,6 +71,11 @@ Sub Adjust_Format()
             Cells(i,1) .Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
         End if
         If Left(Cells(i,1)) = "@" Then Cells(i,1).Replace "@","        "
+End Sub
+
+Sub Copy_Data()
+
+
 End Sub
 
 ' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
@@ -111,17 +118,17 @@ Sub Generate_EmailContent
         :=False, SaveNativePictureFormat:=False, SaveFormsData:=False, _
         SaveAsAOCELetter:=False, CompatibilityMode:=15
     
-'Documents("【WR】邮件内容.docx").Activate
-Set rngFormat = ActiveDocument.Range(Start:=0, End:=0)
+    'Documents("【WR】邮件内容.docx").Activate
+    Set rngFormat = ActiveDocument.Range(Start:=0, End:=0)
 
-With rngFormat
-    .InsertAfter Text:="翟姐："
-    .InsertParagraphAfter
-    .InsertAfter Text:=vbTab & "这是我本周的工作内容概要：" & vbTab
-    '.TypeParagraph
-    '.TypeText Text:=vbTab & "1. 诺和诺德"
-    .Font.Name = "微软雅黑"
-    .Font.Size = 12
-End With
-    MsgBox "已经生成邮件内容！"
+    With rngFormat
+        .InsertAfter Text:="翟姐："
+        .InsertParagraphAfter
+        .InsertAfter Text:=vbTab & "这是我本周的工作内容概要：" & vbTab
+        '.TypeParagraph
+        '.TypeText Text:=vbTab & "1. 诺和诺德"
+        .Font.Name = "微软雅黑"
+        .Font.Size = 12
+    End With
+        MsgBox "已经生成邮件内容！"
 End Sub
