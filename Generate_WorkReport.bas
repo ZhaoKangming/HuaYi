@@ -72,12 +72,13 @@ Sub Adjust_Format()
     Dim i%, RowsNumb%, ColonPosition%
     RowsNumb = [a10000].End(xlUp).Row
     For i = 1 to RowsNumb
-        If Left(Cells(i,1)) = "@" Then
+        If Left(Cells(i,1),1) = "@" Then
             Cells(i,1).Replace "@",""
             ColonPosition = Application.WorksheetFunction.Find("：",Cells(i,1),1)
-            Cells(i,1) .Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
+            Cells(i,1).Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
         End if
-        If Left(Cells(i,1)) = "#" Then Cells(i,1).Replace "#","        "
+        If Left(Cells(i,1),1) = "#" Then Cells(i,1).Replace "#","            "
+    Next
 End Sub
 
 Sub New_Wkbook()
