@@ -8,11 +8,10 @@ Sub Generate_WorkReport()
     Application.ScreenUpdating = False
     Call Read_Txt
     Call Del_Blank_Rows
-    Call Order_Items
     Call Adjust_Format
+    Call Order_Items
     Call New_Wkbook
     Call Copy_Data
-    Call
 
     ThisWorkbook.Save
     Application.ScreenUpdating = True
@@ -44,6 +43,19 @@ Sub Del_Blank_Rows()
     Next i
 End Sub
 
+Sub Adjust_Format()
+    Dim i%, RowsNumb%, ColonPosition%
+    RowsNumb = [a10000].End(xlUp).Row
+    For i = 1 to RowsNumb
+        If Left(Cells(i,1),1) = "@" Then
+            Cells(i,1).Replace "@",""
+            ColonPosition = Application.WorksheetFunction.Find("：",Cells(i,1),1)
+            Cells(i,1).Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
+        End if
+        If Left(Cells(i,1),1) = "#" Then Cells(i,1).Replace "#","            "
+    Next
+End Sub
+
 Sub Order_Items()
     Dim CRrow%, FNrow%, PKrow%, QTrow%
     ' Dim SSrow%, SErow%,
@@ -66,19 +78,6 @@ Sub Order_Items()
     If CRrow - PKrow = 1 Then Rows(CRrow).Delete
     If FNrow - PKrow = 1 Then Rows(PKrow).Delete
     If QTrow - FNrow = 1 Then Rows(FNrow).Delete
-End Sub
-
-Sub Adjust_Format()
-    Dim i%, RowsNumb%, ColonPosition%
-    RowsNumb = [a10000].End(xlUp).Row
-    For i = 1 to RowsNumb
-        If Left(Cells(i,1),1) = "@" Then
-            Cells(i,1).Replace "@",""
-            ColonPosition = Application.WorksheetFunction.Find("：",Cells(i,1),1)
-            Cells(i,1).Characters(1,ColonPosition).Font.Color = RGB(65,105,225)
-        End if
-        If Left(Cells(i,1),1) = "#" Then Cells(i,1).Replace "#","            "
-    Next
 End Sub
 
 Sub New_Wkbook()
