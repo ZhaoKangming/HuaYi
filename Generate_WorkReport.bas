@@ -99,13 +99,16 @@ Sub New_Wkbook()
 End Sub
 
 Sub Copy_Data()
+    Dim ReportWK As Workbook
 
-    
+    Set ReportWK = ""
 
 End Sub
+' 设置内容居中
+' 格式调整
 
+'[todo] 电话记录的处理状态，及居中
 ' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
-
 
 '【TODO】复制模板表，还是单独设置行距？
 '【TODO】格式处理：自动调整格式，比如说全边框，未完成的，正在进行中的进行标注
