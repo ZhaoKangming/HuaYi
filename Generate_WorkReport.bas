@@ -101,6 +101,9 @@ Sub Copy_Data()
     Dim ReportWK As Workbook
 
     Set ReportWK = ""
+End Sub
+
+Sub Beautify()
 
 End Sub
 ' 设置内容居中
@@ -108,11 +111,8 @@ End Sub
 
 '[todo] 电话记录的处理状态，及居中
 ' 【TODO】如果有某项目的客服记录，则在工作周报内容上自动增补这一项
-
-'【TODO】复制模板表，还是单独设置行距？
 '【TODO】格式处理：自动调整格式，比如说全边框，未完成的，正在进行中的进行标注
 '【TODO】生成概要：生成工作周报总结，方便放置到邮件正文中
-
 '【TODO】把本周的工作周报合并汇总到总表中
 
 NewReportName = "【WorkReport】" & FirstDay & "-" & LastDay & "-ZKM.xlsx"
