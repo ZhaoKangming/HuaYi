@@ -19,6 +19,7 @@ Sub Generate_WorkReport()
 End Sub
 
 Sub Read_Txt()
+    ' 注意读取的文本文件需要是以“ANSI”编码保存的
     Dim a, b, i%, j%, r&
     TxtPath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\桌面\Work_Logs.txt"
     Open TxtPath For Input As #1
@@ -100,7 +101,10 @@ End Sub
 Sub Copy_Data()
     Dim ReportWK As Workbook
 
-    Set ReportWK = ""
+    Set ReportWK = Workbooks("【WorkReport】*")
+    
+
+    Set ReportWK = Nothing
 End Sub
 
 Sub Beautify()
