@@ -35,39 +35,39 @@ Selection.WholeStory
 
 '删除其他特殊字符
 Selection.WholeStory
-   Selection.Find.ClearFormatting
-   Selection.Find.Replacement.ClearFormatting
-   With Selection.Find
-       .Text = "      （"
-       .Replacement.Text = "    （"
-       .Forward = True
-       .Wrap = wdFindAsk
-       .Format = False
-       .MatchCase = False
-       .MatchWholeWord = False
-       .MatchByte = True
-       .MatchWildcards = False
-       .MatchSoundsLike = False
-       .MatchAllWordForms = False
-   End With
-   Selection.Find.Execute Replace:=wdReplaceAll
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "      （"
+        .Replacement.Text = "    （"
+        .Forward = True
+        .Wrap = wdFindAsk
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchByte = True
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
 '删除文档中的“正方形字符”，替换为两个空格
-   Selection.Find.ClearFormatting
-       Selection.Find.Replacement.ClearFormatting
-       With Selection.Find
-           .Text = "　　"
-           .Replacement.Text = "  "
-           .Forward = True
-           .Wrap = wdFindAsk
-           .Format = False
-           .MatchCase = False
-           .MatchWholeWord = False
-           .MatchByte = True
-           .MatchWildcards = False
-           .MatchSoundsLike = False
-           .MatchAllWordForms = False
-       End With
-       Selection.Find.Execute Replace:=wdReplaceAll
+Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "　　"
+        .Replacement.Text = "  "
+        .Forward = True
+        .Wrap = wdFindAsk
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchByte = True
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
 
 '部分段落增添合适的首行缩进
 Selection.WholeStory
@@ -232,7 +232,7 @@ Selection.Find.Execute Replace:=wdReplaceAll
     Selection.Find.Execute Replace:=wdReplaceAll
 
 '清除掉文章内多余的换行符
- Selection.WholeStory
+Selection.WholeStory
         Selection.Find.ClearFormatting
         Selection.Find.Replacement.ClearFormatting
         With Selection.Find
@@ -250,9 +250,9 @@ Selection.Find.Execute Replace:=wdReplaceAll
         End With
         Selection.Find.Execute Replace:=wdReplaceAll
 
- Selection.WholeStory
- Selection.Find.ClearFormatting
- Selection.Find.Replacement.ClearFormatting
+Selection.WholeStory
+Selection.Find.ClearFormatting
+Selection.Find.Replacement.ClearFormatting
     With Selection.Find
         .Text = "T2DM^p平均病程"
         .Replacement.Text = "T2DM平均病程"
@@ -1592,11 +1592,11 @@ Selection.Find.Execute Replace:=wdReplaceAll
 '    Loop
 
 '删除所有下划线
- Selection.WholeStory
-    Selection.Font.UnderlineColor = wdColorAutomatic
-    Selection.Font.Underline = wdUnderlineSingle
-    Selection.Font.UnderlineColor = wdColorAutomatic
-    Selection.Font.Underline = wdUnderlineNone
+Selection.WholeStory
+Selection.Font.UnderlineColor = wdColorAutomatic
+Selection.Font.Underline = wdUnderlineSingle
+Selection.Font.UnderlineColor = wdColorAutomatic
+Selection.Font.Underline = wdUnderlineNone
 
 '设置全文行距为多倍行距1.25
  Selection.WholeStory
