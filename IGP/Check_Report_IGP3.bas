@@ -1,27 +1,39 @@
-Sub 报告格式规范化()
+Sub Check_Report()
     
 'TODO:有人会修改标题，可能查不到 项目报告，或者在项目报告前面还有字符
+'TODO:确定是否是往年的报告
+
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
     
     Call Replace_Product_Name
+    Call Unified_Format
+    Call Count_Words
+    Call Check_Novonordisk
 
+    Call Get_Summary
+
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+    ActiveWindow.ActivePane.VerticalPercentScrolled = 0  '将光标移动到文章开头
+    ActiveDocument.Save
+    Msgbox "报告审核完成！"
 End Sub
 
 Sub Replace_Product_Name()
-    ' 替换商品名为通用名
+'【功能】替换商品名为通用名
     Dim i%, Product_Name_Arr, Common_Name_Arr
-    Product_Name_Arr = Array("诺和锐30", "诺和锐", "锐30", "锐50", "诺和力", "诺和达", "诺和生", "诺和龙", _
-                            "诺和平", "诺和灵30R", "诺和灵50R", "诺和灵", "来得时", "甘舒霖", "佳维乐", _
-                            "万苏平", "倍欣", "达美康", "安达唐", "亚莫利", "拜唐苹", "捷诺维", "欧唐宁", _
-                            "格华止", "优泌乐", "优泌林")
-    Common_Name_Arr = Array("门冬胰岛素30注射液", "门冬胰岛素", "门冬胰岛素30注射液", "门冬胰岛素50注射液", _
-                            "利拉鲁肽注射液", "德谷胰岛素注射液", "注射用生物合成高血糖素", "瑞格列奈片", _
-                            "地特胰岛素注射液", "精蛋白生物合成人胰岛素注射液(预混30R)", _
-                            "精蛋白生物合成人胰岛素注射液(预混50R)", "精蛋白生物合成人胰岛素注射液", _
-                            "甘精胰岛素注射液", "混合重组人胰岛素注射液", "维格列汀片", "格列美脲片", _
-                            "伏格列波糖片", "格列齐特", "达格列净片", "格列美脲片", "阿卡波糖片", "西格列汀片", _
-                            "利格列汀片", "盐酸二甲双胍片", "赖脯胰岛素注射液", "精蛋白锌重组人胰岛素混合注射液")
+    Product_Name_Arr = Array("诺和锐30","诺和锐","锐30","锐50","诺和力","诺和达","诺和生","诺和龙", _
+                            "诺和平","诺和灵30R","诺和灵50R","诺和灵","来得时","甘舒霖","佳维乐", _
+                            "万苏平","倍欣","达美康","安达唐","亚莫利","拜唐苹","捷诺维","欧唐宁", _
+                            "格华止","优泌乐","优泌林")
+    Common_Name_Arr = Array("门冬胰岛素30注射液","门冬胰岛素","门冬胰岛素30注射液","门冬胰岛素50注射液", _
+                            "利拉鲁肽注射液","德谷胰岛素注射液","注射用生物合成高血糖素","瑞格列奈片", _
+                            "地特胰岛素注射液","精蛋白生物合成人胰岛素注射液(预混30R)", _
+                            "精蛋白生物合成人胰岛素注射液(预混50R)","精蛋白生物合成人胰岛素注射液", _
+                            "甘精胰岛素注射液","混合重组人胰岛素注射液","维格列汀片","格列美脲片", _
+                            "伏格列波糖片","格列齐特","达格列净片","格列美脲片","阿卡波糖片","西格列汀片", _
+                            "利格列汀片","盐酸二甲双胍片","赖脯胰岛素注射液","精蛋白锌重组人胰岛素混合注射液")
     For i = 0 TO UBound(Product_Name_Arr)
         Selection.WholeStory
         Selection.Find.ClearFormatting
@@ -43,33 +55,118 @@ Sub Replace_Product_Name()
     Next
 End Sub
 
-
-'清除底纹（从网页中直接复制带来的）
+Sub Unified_Format()
+'【功能】清除特殊格式，统一报告样式
+    Dim i%, Initial_Symbol_Arr, Treated_SymbolP_Arr
+    '将全文文本颜色改为黑色，字体改为微软雅黑
     Selection.WholeStory
+    Selection.Font.Color = black
+    Selection.Font.Name = "微软雅黑"
+
+    '清除底纹（从网页中直接复制带来的）
     Selection.Shading.Texture = wdTextureNone
     Selection.Shading.ForegroundPatternColor = wdColorAutomatic
     Selection.Shading.BackgroundPatternColor = wdColorAutomatic
-'清除字符底纹
+
+    '清除字符底纹
     Selection.Font.Shading.Texture = wdTextureNone
 
-'清除手动分页符为换行符
-    Selection.WholeStory
-    Selection.Find.ClearFormatting
-    Selection.Find.Replacement.ClearFormatting
-    With Selection.Find
-        .Text = "^b"
-        .Replacement.Text = "^p"
-        .Forward = True
-        .Wrap = wdFindAsk
-        .Format = False
-        .MatchCase = False
-        .MatchWholeWord = False
-        .MatchByte = True
-        .MatchWildcards = False
-        .MatchSoundsLike = False
-        .MatchAllWordForms = False
+    '删除所有下划线
+    Selection.Font.UnderlineColor = wdColorAutomatic
+    Selection.Font.Underline = wdUnderlineSingle
+    Selection.Font.UnderlineColor = wdColorAutomatic
+    Selection.Font.Underline = wdUnderlineNone
+
+    '设置全文行距为多倍行距1.25
+    With Selection.ParagraphFormat
+        .SpaceBeforeAuto = False
+        .SpaceAfterAuto = False
+        .LineSpacingRule = wdLineSpaceMultiple
+        .LineSpacing = LinesToPoints(1.25)
+        .WordWrap = True
     End With
-    Selection.Find.Execute Replace:=wdReplaceAll
+    ActiveWindow.ActivePane.VerticalPercentScrolled = 0
+
+    '删除掉多余的空行、手动分页符
+    Initial_Symbol_Arr = Array("^p^p^p","^b")
+    Treated_SymbolP_Arr = Array("^p^p","^p")
+
+    For i = 0 TO UBound(Initial_Symbol_Arr)
+        Selection.WholeStory
+        Selection.Find.ClearFormatting
+        Selection.Find.Replacement.ClearFormatting
+        With Selection.Find
+            .Text = Initial_Symbol_Arr(i)
+            .Replacement.Text = Treated_SymbolP_Arr(i)
+            .Forward = True
+            .Wrap = wdFindAsk
+            .Format = False
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchByte = True
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+        End With
+        Selection.Find.Execute Replace:=wdReplaceAll
+    Next
+End Sub
+
+
+
+Sub Count_Words()
+'【功能】检查总结字数是否超过200，总字数是否缺少（很可能有删减部分）
+    Dim sWordsCnt As Long
+    Selection.WholeStory
+    If Right(Selection, 206) Like "*四、总结*" Then MsgBox "总结字数不够200字"
+
+    ' sWordsCnt = ActiveDocument.Range.ComputeStatistics(wdStatisticWords)
+    ' If sWordsCnt < 2947 then MsgBox "不满足字数要求，增补字数（含总结）为" & sWordsCnt-2747
+End Sub
+
+Sub Check_Novonordisk()
+'【功能】统计出现诺和的次数，并将其高亮
+    Dim times%
+    With ActiveDocument.Content.Find
+        Do While .Execute(FindText:="诺和") = True
+            times = times + 1
+        Loop
+    End With
+    If times > 0 Then
+        'Application.DisplayAlerts = False
+        Options.DefaultHighlightColorIndex = wdYellow
+        Selection.WholeStory
+        Selection.Find.ClearFormatting
+        Selection.Find.Replacement.ClearFormatting
+        Selection.Find.Replacement.Highlight = True
+        With Selection.Find
+            .Text = "诺和"
+            .Replacement.Text = "诺和"
+            .Forward = True
+            .Wrap = wdFindAsk
+            .Format = True
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchByte = True
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+        End With
+        Selection.Find.Execute Replace:=wdReplaceAll
+        'Application.DisplayAlerts = True
+        MsgBox ("文档中存在" & Str(times) & "个--诺和--，已将其高亮显示"), 48, "查找完成"
+    End if
+End Sub
+
+Sub Get_Summary()
+'【功能】提取总结部分
+    ' 建库比对，查重
+    ' 将总结部分复制到excel表中，注意清除格式，先将报告总结部分清除特殊格式，清除换行符，特殊符号等等。然后按照，与。作为分割符将其拆分
+    ' 把总结部分比对，查找重复，若重复给出比对结果，取重复率最高的前两个，计算出重复率，返回单元格数值，重复者信息。
+
+End Sub
+
+
 
 '删除其他特殊字符
 Selection.WholeStory
@@ -89,23 +186,7 @@ Selection.WholeStory
         .MatchAllWordForms = False
     End With
     Selection.Find.Execute Replace:=wdReplaceAll
-'删除文档中的“正方形字符”，替换为两个空格
-Selection.Find.ClearFormatting
-    Selection.Find.Replacement.ClearFormatting
-    With Selection.Find
-        .Text = "　　"
-        .Replacement.Text = "  "
-        .Forward = True
-        .Wrap = wdFindAsk
-        .Format = False
-        .MatchCase = False
-        .MatchWholeWord = False
-        .MatchByte = True
-        .MatchWildcards = False
-        .MatchSoundsLike = False
-        .MatchAllWordForms = False
-    End With
-    Selection.Find.Execute Replace:=wdReplaceAll
+
 
 '部分段落增添合适的首行缩进
 Selection.WholeStory
@@ -250,24 +331,6 @@ With Selection.Find
 End With
 Selection.Find.Execute Replace:=wdReplaceAll
 
-'删除掉多余的空行
-    Selection.WholeStory
-    Selection.Find.ClearFormatting
-    Selection.Find.Replacement.ClearFormatting
-    With Selection.Find
-        .Text = "^p^p"
-        .Replacement.Text = "^p"
-        .Forward = True
-        .Wrap = wdFindAsk
-        .Format = False
-        .MatchCase = False
-        .MatchWholeWord = False
-        .MatchByte = True
-        .MatchWildcards = False
-        .MatchSoundsLike = False
-        .MatchAllWordForms = False
-    End With
-    Selection.Find.Execute Replace:=wdReplaceAll
 
 '清除掉文章内多余的换行符
 Selection.WholeStory
@@ -577,23 +640,23 @@ Selection.Find.Replacement.ClearFormatting
 Selection.Find.Execute Replace:=wdReplaceAll
 
 Selection.WholeStory
-  Selection.Find.ClearFormatting
-  Selection.Find.Font.Italic = True
-  Selection.Find.Replacement.ClearFormatting
-  With Selection.Find
-      .Text = "（^p"
-      .Replacement.Text = ""
-      .Forward = True
-      .Wrap = wdFindAsk
-      .Format = True
-      .MatchCase = False
-      .MatchWholeWord = False
-      .MatchByte = True
-      .MatchWildcards = False
-      .MatchSoundsLike = False
-      .MatchAllWordForms = False
-  End With
-  Selection.Find.Execute Replace:=wdReplaceAll
+Selection.Find.ClearFormatting
+Selection.Find.Font.Italic = True
+Selection.Find.Replacement.ClearFormatting
+With Selection.Find
+    .Text = "（^p"
+    .Replacement.Text = ""
+    .Forward = True
+    .Wrap = wdFindAsk
+    .Format = True
+    .MatchCase = False
+    .MatchWholeWord = False
+    .MatchByte = True
+    .MatchWildcards = False
+    .MatchSoundsLike = False
+    .MatchAllWordForms = False
+End With
+Selection.Find.Execute Replace:=wdReplaceAll
 
 Selection.WholeStory
 Selection.Find.ClearFormatting
@@ -867,7 +930,7 @@ Selection.WholeStory
     End With
     Selection.Find.Execute Replace:=wdReplaceAll
 
- Selection.WholeStory
+    Selection.WholeStory
     Selection.Find.ClearFormatting
     Selection.Find.Replacement.ClearFormatting
     With Selection.Find
@@ -886,7 +949,7 @@ Selection.WholeStory
     Selection.Find.Execute Replace:=wdReplaceAll
 
 
- Selection.WholeStory
+    Selection.WholeStory
     Selection.Find.ClearFormatting
     Selection.Find.Replacement.ClearFormatting
     With Selection.Find
@@ -905,40 +968,40 @@ Selection.WholeStory
     Selection.Find.Execute Replace:=wdReplaceAll
 
     Selection.WholeStory
-       Selection.Find.ClearFormatting
-       Selection.Find.Replacement.ClearFormatting
-       With Selection.Find
-           .Text = "（3）^p其他：" & vbTab & "。"
-           .Replacement.Text = " "
-           .Forward = True
-           .Wrap = wdFindAsk
-           .Format = False
-           .MatchCase = False
-           .MatchWholeWord = False
-           .MatchByte = True
-           .MatchWildcards = False
-           .MatchSoundsLike = False
-           .MatchAllWordForms = False
-       End With
-       Selection.Find.Execute Replace:=wdReplaceAll
+    Selection.Find.ClearFormatting
+    Selection.Find.Replacement.ClearFormatting
+    With Selection.Find
+        .Text = "（3）^p其他：" & vbTab & "。"
+        .Replacement.Text = " "
+        .Forward = True
+        .Wrap = wdFindAsk
+        .Format = False
+        .MatchCase = False
+        .MatchWholeWord = False
+        .MatchByte = True
+        .MatchWildcards = False
+        .MatchSoundsLike = False
+        .MatchAllWordForms = False
+    End With
+    Selection.Find.Execute Replace:=wdReplaceAll
 
-       Selection.WholeStory
-          Selection.Find.ClearFormatting
-          Selection.Find.Replacement.ClearFormatting
-          With Selection.Find
-              .Text = "；（3）^p其他：  。"
-              .Replacement.Text = "。"
-              .Forward = True
-              .Wrap = wdFindAsk
-              .Format = False
-              .MatchCase = False
-              .MatchWholeWord = False
-              .MatchByte = True
-              .MatchWildcards = False
-              .MatchSoundsLike = False
-              .MatchAllWordForms = False
-          End With
-          Selection.Find.Execute Replace:=wdReplaceAll
+    Selection.WholeStory
+        Selection.Find.ClearFormatting
+        Selection.Find.Replacement.ClearFormatting
+        With Selection.Find
+            .Text = "；（3）^p其他：  。"
+            .Replacement.Text = "。"
+            .Forward = True
+            .Wrap = wdFindAsk
+            .Format = False
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchByte = True
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+        End With
+        Selection.Find.Execute Replace:=wdReplaceAll
 
 Selection.WholeStory
     Selection.Find.ClearFormatting
@@ -1302,66 +1365,6 @@ Selection.Find.Execute Replace:=wdReplaceAll
     Selection.Find.Execute Replace:=wdReplaceAll
 
 
-'删除多余的长空格以及其下划线
-Selection.Find.ClearFormatting
-    Selection.Find.Replacement.ClearFormatting
-    With Selection.Find.Replacement.Font
-        .Underline = wdUnderlineSingle
-        .Color = -587137025
-    End With
-    With Selection.Find
-        .Text = vbTab
-        .Replacement.Text = " "
-        .Forward = True
-        .Wrap = wdFindAsk
-        .Format = True
-        .MatchCase = False
-        .MatchWholeWord = False
-        .MatchByte = True
-        .MatchWildcards = False
-        .MatchSoundsLike = False
-        .MatchAllWordForms = False
-    End With
-Selection.Find.Execute Replace:=wdReplaceAll
-'将全文文本颜色改为黑色，字体改为微软雅黑，并将光标移动到文章开头
-    Selection.WholeStory
-    Selection.Font.Color = black
-    Selection.Font.Name = "微软雅黑"
-    ActiveWindow.ActivePane.VerticalPercentScrolled = 0
-
-'将空格下划线设置为黑色
-
-'    Selection.Find.ClearFormatting
-'    With Selection.Find
-'        .Forward = True
-'        .Font.Underline = wdUnderlineSingle
-'    End With
-
-'    Do While Selection.Find.Execute
-'        Selection.Font.UnderlineColor = wdColorBlack
-'        Selection.Font.Underline = wdUnderlineNone
-'        Selection.Font.UnderlineColor = wdColorBlack
-'        Selection.Font.Underline = wdUnderlineSingle
-'    Loop
-
-'删除所有下划线
-Selection.WholeStory
-Selection.Font.UnderlineColor = wdColorAutomatic
-Selection.Font.Underline = wdUnderlineSingle
-Selection.Font.UnderlineColor = wdColorAutomatic
-Selection.Font.Underline = wdUnderlineNone
-
-'设置全文行距为多倍行距1.25
- Selection.WholeStory
-    With Selection.ParagraphFormat
-        .SpaceBeforeAuto = False
-        .SpaceAfterAuto = False
-        .LineSpacingRule = wdLineSpaceMultiple
-        .LineSpacing = LinesToPoints(1.25)
-        .WordWrap = True
-    End With
-    ActiveWindow.ActivePane.VerticalPercentScrolled = 0
-
 '修改由空格代替Tab键导致的格式错乱
 Selection.WholeStory
 Selection.Find.ClearFormatting
@@ -1509,66 +1512,6 @@ Selection.Find.Execute Replace:=wdReplaceAll
         End With
     Selection.Find.Execute Replace:=wdReplaceAll
 
-Application.ScreenUpdating = False
-Application.DisplayAlerts = True
 
 '检查是否有空格没有填
 
-'检查总结字数是否超过200，MsgBox给出提示：选定最后206个字符（不含空格），看是否含有“四、总结”
-
-    Selection.WholeStory
-    If Right(Selection, 206) Like "*四、总结*" Then MsgBox "总结字数不够200字"
-
-'检查文章所有字数是否超过，MsgBox给出提示
-    Dim sWordsCnt As Long
-    sWordsCnt = ActiveDocument.Range.ComputeStatistics(wdStatisticWords)
-    If sWordsCnt < 2947 then
-        MsgBox "不满足字数要求，增补字数（含总结）为" & sWordsCnt-2747
-        else
-        MsgBox "满足字数要求，增补字数（含总结）为" & sWordsCnt-2747
-    End if
-'统计出现诺和的次数，并将其高亮
-Dim Text$, tim%
-'Text = InputBox("请输入要查找的文本 : ", "计算文本出现次数")
-Text = "诺和"
-With ActiveDocument.Content.Find
-Do While .Execute(FindText:=Text) = True
-tim = tim + 1
-Loop
-End With
-If tim > 0 Then
-Application.DisplayAlerts = False
-    Options.DefaultHighlightColorIndex = wdYellow
-    Selection.WholeStory
-    Selection.Find.ClearFormatting
-    Selection.Find.Replacement.ClearFormatting
-    Selection.Find.Replacement.Highlight = True
-    With Selection.Find
-        .Text = "诺和"
-        .Replacement.Text = "诺和"
-        .Forward = True
-        .Wrap = wdFindAsk
-        .Format = True
-        .MatchCase = False
-        .MatchWholeWord = False
-        .MatchByte = True
-        .MatchWildcards = False
-        .MatchSoundsLike = False
-        .MatchAllWordForms = False
-    End With
-    Selection.Find.Execute Replace:=wdReplaceAll
-    Application.DisplayAlerts = True
-
-MsgBox ("文档中存在" + Str(tim) + "个" + " # " & Text & " # ，已将其高亮显示"), 48, "查找完成"
-
-End if
-
-'保存文件
-ActiveDocument.Save
-
-
-'建库比对，查重
-'将总结部分复制到excel表中，注意清除格式，先将报告总结部分清除特殊格式，清除换行符，特殊符号等等。然后按照，与。作为分割符将其拆分
-'把总结部分比对，查找重复，若重复给出比对结果，取重复率最高的前两个，计算出重复率，返回单元格数值，重复者信息。
-
-End Sub
