@@ -1,8 +1,48 @@
 Sub 报告格式规范化()
-
-'【TakeCare】有人会修改标题，可能查不到 项目报告，或者在项目报告前面还有字符
+    
+'TODO:有人会修改标题，可能查不到 项目报告，或者在项目报告前面还有字符
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
+    
+    Call Replace_Product_Name
+
+End Sub
+
+Sub Replace_Product_Name()
+    ' 替换商品名为通用名
+    Dim i%, Product_Name_Arr, Common_Name_Arr
+    Product_Name_Arr = Array("诺和锐30", "诺和锐", "锐30", "锐50", "诺和力", "诺和达", "诺和生", "诺和龙", _
+                            "诺和平", "诺和灵30R", "诺和灵50R", "诺和灵", "来得时", "甘舒霖", "佳维乐", _
+                            "万苏平", "倍欣", "达美康", "安达唐", "亚莫利", "拜唐苹", "捷诺维", "欧唐宁", _
+                            "格华止", "优泌乐", "优泌林")
+    Common_Name_Arr = Array("门冬胰岛素30注射液", "门冬胰岛素", "门冬胰岛素30注射液", "门冬胰岛素50注射液", _
+                            "利拉鲁肽注射液", "德谷胰岛素注射液", "注射用生物合成高血糖素", "瑞格列奈片", _
+                            "地特胰岛素注射液", "精蛋白生物合成人胰岛素注射液(预混30R)", _
+                            "精蛋白生物合成人胰岛素注射液(预混50R)", "精蛋白生物合成人胰岛素注射液", _
+                            "甘精胰岛素注射液", "混合重组人胰岛素注射液", "维格列汀片", "格列美脲片", _
+                            "伏格列波糖片", "格列齐特", "达格列净片", "格列美脲片", "阿卡波糖片", "西格列汀片", _
+                            "利格列汀片", "盐酸二甲双胍片", "赖脯胰岛素注射液", "精蛋白锌重组人胰岛素混合注射液")
+    For i = 0 TO UBound(Product_Name_Arr)
+        Selection.WholeStory
+        Selection.Find.ClearFormatting
+        Selection.Find.Replacement.ClearFormatting
+        With Selection.Find
+            .Text = Product_Name_Arr(i)
+            .Replacement.Text = Common_Name_Arr(i)
+            .Forward = True
+            .Wrap = wdFindAsk
+            .Format = False
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchByte = True
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+        End With
+        Selection.Find.Execute Replace:=wdReplaceAll
+    Next
+End Sub
+
 
 '清除底纹（从网页中直接复制带来的）
     Selection.WholeStory
@@ -13,7 +53,7 @@ Sub 报告格式规范化()
     Selection.Font.Shading.Texture = wdTextureNone
 
 '清除手动分页符为换行符
-Selection.WholeStory
+    Selection.WholeStory
     Selection.Find.ClearFormatting
     Selection.Find.Replacement.ClearFormatting
     With Selection.Find
@@ -1470,19 +1510,14 @@ Selection.Find.Execute Replace:=wdReplaceAll
     Selection.Find.Execute Replace:=wdReplaceAll
 
 Application.ScreenUpdating = False
-'恢复弹窗
 Application.DisplayAlerts = True
+
 '检查是否有空格没有填
 
 '检查总结字数是否超过200，MsgBox给出提示：选定最后206个字符（不含空格），看是否含有“四、总结”
-    Dim artical As String
-      Selection.WholeStory
-      artical = Right(Selection, 206)
-      If artical Like "*四、总结*" Then
-      MsgBox "总结字数不够200字"
-      'Else
-      'MsgBox "总结字数足够200字"
-      End If
+
+    Selection.WholeStory
+    If Right(Selection, 206) Like "*四、总结*" Then MsgBox "总结字数不够200字"
 
 '检查文章所有字数是否超过，MsgBox给出提示
     Dim sWordsCnt As Long
