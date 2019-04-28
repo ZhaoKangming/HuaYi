@@ -1,10 +1,8 @@
 Sub 报告格式规范化()
 
 '【TakeCare】有人会修改标题，可能查不到 项目报告，或者在项目报告前面还有字符
-'禁止屏幕刷新，提高程序运行效率
-  Application.ScreenUpdating = False
-'禁止弹框提示
-  Application.DisplayAlerts = False
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
 
 '清除底纹（从网页中直接复制带来的）
     Selection.WholeStory
