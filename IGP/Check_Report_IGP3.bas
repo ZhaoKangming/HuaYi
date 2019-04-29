@@ -10,7 +10,7 @@ Sub Check_Report()
     Call Unified_Format
     Call Delete_Prompt_Text
     Call Check_Integrity
-    Call Blank_To_0
+    Call Normalize_Sentences
     Call Check_Novonordisk
     Call Count_Words
     Call Get_Summary
@@ -247,7 +247,7 @@ Sub Count_Words()
 '【功能】检查总结字数是否超过200，总字数是否缺少（很可能有删减部分）
     Dim sWordsCnt As Long
     Selection.WholeStory
-    If Right(Selection, 206) Like "*四、总结*" Then MsgBox "总结字数不够200字"
+    If Right(Selection, 186) Like "*四、总结*" Then MsgBox "总结字数不够200字"
 
     ' sWordsCnt = ActiveDocument.Range.ComputeStatistics(wdStatisticWords)
     ' If sWordsCnt < 2947 then MsgBox "不满足字数要求，增补字数（含总结）为" & sWordsCnt-2747
