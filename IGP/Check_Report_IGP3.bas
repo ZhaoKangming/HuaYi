@@ -90,8 +90,8 @@ Sub Unified_Format()
     ActiveWindow.ActivePane.VerticalPercentScrolled = 0
 
     '删除掉多余的空行、手动分页符
-    Initial_Symbol_Arr = Array("^p^p^p","^b","_")
-    Treated_SymbolP_Arr = Array("^p^p","^p","")
+    Initial_Symbol_Arr = Array("^p^p^p","^b","_","	u/L","	%","	mmol/L","	u")
+    Treated_SymbolP_Arr = Array("^p^p","^p",""," u/L"," %"," mmol/L"," u")
 
     For i = 0 TO UBound(Initial_Symbol_Arr)
         Selection.WholeStory
