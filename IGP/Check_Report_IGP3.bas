@@ -89,7 +89,7 @@ Sub Unified_Format()
     End With
     ActiveWindow.ActivePane.VerticalPercentScrolled = 0
 
-    '删除掉多余的空行、手动分页符
+    '删除掉多余的空行、手动分页符、Tab更换为空格
     Initial_Symbol_Arr = Array("^p^p^p","^b","_","	u/L","	%","	mmol/L","	u")
     Treated_SymbolP_Arr = Array("^p^p","^p",""," u/L"," %"," mmol/L"," u")
 
