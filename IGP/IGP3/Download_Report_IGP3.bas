@@ -2,6 +2,7 @@
 Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" (ByVal pCaller As Long, ByVal szURL As String, _
 ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
 
+'TODO:注意区分报告与病例
 Sub DownLoad_Report()
 Dim lastRow%, lastRow_Rep%, lastRow_Temp%, reportDate$, dateFile$, dateCell$, dateCheck$
 Dim rowNumb%, myFolder$, extensionName$, serialNumb$

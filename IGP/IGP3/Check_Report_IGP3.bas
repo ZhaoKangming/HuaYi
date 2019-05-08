@@ -177,7 +177,7 @@ Sub Check_Integrity()
     Next
     If Missing_Sections <> "" Then
         With CreateObject("new:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")
-            .SetText Missing_Sections, 13 '这个13代表的Unicode字符集，这个参数至关重要
+            .SetText "报告缺少以下部分：" & Missing_Sections, 13 '这个13代表的Unicode字符集，这个参数至关重要
             .PutInClipboard
         End With
         Msgbox "报告缺少以下部分：" & vbCrlf & vbCrlf & Missing_Sections & vbCrlf & "已复制到剪切板"
@@ -247,8 +247,13 @@ Sub Count_Words()
 '【功能】检查总结字数是否超过200，总字数是否缺少（很可能有删减部分）
     Dim sWordsCnt As Long
     Selection.WholeStory
-    If Right(Selection, 186) Like "*四、总结*" Then MsgBox "总结字数不够200字"
-
+    If Right(Selection, 186) Like "*四、总结*" Then
+        With CreateObject("new:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")
+            .SetText "总结部分字数不够200字", 13 '这个13代表的Unicode字符集，这个参数至关重要
+            .PutInClipboard
+        End With
+        MsgBox "总结部分字数不够200字"
+    End If
     ' sWordsCnt = ActiveDocument.Range.ComputeStatistics(wdStatisticWords)
     ' If sWordsCnt < 2947 then MsgBox "不满足字数要求，增补字数（含总结）为" & sWordsCnt-2747
 End Sub
