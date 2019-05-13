@@ -12,7 +12,7 @@ lastRow_Temp = Range("a1048576").End(xlUp).Row
 
 With ActiveSheet.UsedRange
     .Replace "报告1",""
-    .Replace "报告2","_2"
+    .Replace "报告2","_R2"
     .Replace "未审核",""
 End With
 
@@ -52,7 +52,7 @@ For rowNumb = 1 To lastRow_Temp
 Next
 'TODO:如何确定是否有报告没有下载，没有下载的标注出来
 '【TODO】复制内容到桌面，以及合格库
-  MsgBox "所有报告都已经下载完成啦"
+    MsgBox "所有报告都已经下载完成啦"
 Cells.Select
 Selection.ClearContents
 Sheets("报告").Select
