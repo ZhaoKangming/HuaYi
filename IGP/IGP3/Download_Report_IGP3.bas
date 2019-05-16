@@ -3,7 +3,7 @@ Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownlo
 ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As Long
 
 'TODO:注意区分报告与病例
-Sub DownLoad_Report()
+Sub Get_Report()
 Dim lastRow%, lastRow_Rep%, lastRow_Temp%, reportDate$, dateFile$, dateCell$, dateCheck$
 Dim rowNumb%, myFolder$, extensionName$, serialNumb$
 Application.ScreenUpdating = False
@@ -26,7 +26,7 @@ Columns("D:D").NumberFormatLocal = "yymmdd"
 
 
 For rowNumb = 2 To lastRow_Temp
-    ' 生成文件名
+    ' 生成文件名 
     Cells(rowNumb,6) = Cells(rowNumb,1) & "_" & Cells(rowNumb,2) & "_" & Cells(rowNumb,3) & _
                         Application.WorksheetFunction.Text(Cells(rowNumb,4),"yymmdd")
 Next
