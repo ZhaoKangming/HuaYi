@@ -27,7 +27,7 @@ Columns("D:D").NumberFormatLocal = "yymmdd"
 
 For rowNumb = 2 To lastRow_Temp
     ' 生成文件名 
-    Cells(rowNumb,6) = Cells(rowNumb,1) & "_" & Cells(rowNumb,2) & "_" & Cells(rowNumb,3) & _
+    Cells(rowNumb,6) = Cells(rowNumb,1) & "_" & Cells(rowNumb,2) & Cells(rowNumb,3) & "_" & _
                         Application.WorksheetFunction.Text(Cells(rowNumb,4),"yymmdd")
 Next
 

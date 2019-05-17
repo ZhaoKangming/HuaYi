@@ -90,8 +90,8 @@ Sub Unified_Format()
     ActiveWindow.ActivePane.VerticalPercentScrolled = 0
 
     '删除掉多余的空行、手动分页符、Tab更换为空格
-    Initial_Symbol_Arr = Array("^p^p^p","^b","_","	u/L","	%","	mmol/L","	u")
-    Treated_SymbolP_Arr = Array("^p^p","^p",""," u/L"," %"," mmol/L"," u")
+    Initial_Symbol_Arr = Array("^p^p^p","^b","_","	u/L","	%","	mmol/L","^tmmol/L","	u","^t%","FPG^t","PPG^t")
+    Treated_SymbolP_Arr = Array("^p^p","^p",""," u/L"," %"," mmol/L"," mmol/L"," u"," %","FPG ","PPG ")
 
     For i = 0 TO UBound(Initial_Symbol_Arr)
         Selection.WholeStory
@@ -124,8 +124,10 @@ Sub Delete_Prompt_Text()
                             "此处请记录本组患者总体血糖控制情况，例如：^p", _
                             "（此处建议您描述通过本项目得出的心得体会，可从患者生活方式、并发证、治疗方案等方面进行阐述）", _
                             "（此处建议您提出自己认为的可能的原因）^p", _
+                            "（此处建议您提出自己认为的可能的原因）", _
                             "（此处建议您提出自己在选择胰岛素治疗方案时考量的因素以及如何考量、为什么考量这些因素）", _
                             "（此处建议您描述自己在临床工作中根据什么因素制定个体化HbA1c目标，为什么）^p", _
+                            "（此处建议您描述自己在临床工作中根据什么因素制定个体化HbA1c目标，为什么）", _
                             "（请基于您此次的临床实践记录内容，并根据指南或各种胰岛素产品说明书推荐的使用方法，谈谈临床实践与指南之间的差异，为什么会存在这些差异，应如何解决）^p", _
                             "（此处建议您描述本次临床实践中有关剂量滴定的部分与指南的差异，并说明为什么会存在这种差异，如何解决）^p", _
                             "（此处建议您说明经过 3 个月的治疗情况，可阐述多少比例的患者血糖达到目标值，可总结出什么经验，如联合用药、患者依从性及自我管理等。）^p", _
