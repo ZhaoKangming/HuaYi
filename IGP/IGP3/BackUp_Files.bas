@@ -31,6 +31,7 @@ Sub BackUp_Files()
     Rarexe = "C:\Softwares\Haozip\HaoZip.exe" 'rar程序路径
     RarFile = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\桌面\赋能起航-报告病历审核-" & Format(Now, "yymmdd") & ".zip" '压缩后的rar文件
     FileString = Rarexe & " -R " & RarFile & " " & Dst_Dir  'rar程序的 R命令，用来压缩文件夹
+    
     Result = Shell(FileString, vbHide) '执行压缩
     Msgbox "Finished the work!"
 End Sub

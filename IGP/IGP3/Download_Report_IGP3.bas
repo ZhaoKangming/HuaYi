@@ -6,6 +6,8 @@ ByVal szFileName As String, ByVal dwReserved As Long, ByVal lpfnCB As Long) As L
 Sub Get_Report()
 Dim lastRow%, lastRow_Rep%, lastRow_Temp%, reportDate$, dateFile$, dateCell$, dateCheck$
 Dim rowNumb%, myFolder$, extensionName$, serialNumb$
+
+Dim Temp_text$
 Application.ScreenUpdating = False
 Sheets("Temp").Select
 lastRow_Temp = Range("a1048576").End(xlUp).Row
@@ -13,6 +15,8 @@ lastRow_Temp = Range("a1048576").End(xlUp).Row
 With ActiveSheet.UsedRange
     .Replace "报告1",""
     .Replace "报告2","_R2"
+    .Replace "病例1",""
+    .Replace "病例2","_C2"
     .Replace "未审核",""
 End With
 
