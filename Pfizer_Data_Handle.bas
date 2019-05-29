@@ -14,7 +14,11 @@ Sub Pfizer_Data_Handle()
     End If
 
     Src_Wkb = Workbooks(ActiveWorkbook.Name)
-    RowNumbs = Sheets("Sheet1").[a99999].End(xlUp).Row
+    Sheets(1).Copy Before:=Sheets(1)
+    Sheets(2).Name = "TEMP"
+    Sheets(2).Select
+    RowNumbs = Sheets("TEMP").[a99999].End(xlUp).Row
+
     Set Temp_Dict = CreateObject("scripting.dictionary")
     For i = 2 to RowNumbs
         If Cells(i,1)

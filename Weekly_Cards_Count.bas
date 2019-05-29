@@ -1,4 +1,8 @@
 Sub Get_CardsNumb()
+    Application.ScreenUpdating = False
+
+
+    'TODO:检查市是否有增加？
     市
     导出的数据有些事文本格式需要转换成数字格式
     表格样式设置，字体，列宽，字号，对齐等，冻结首行
@@ -9,6 +13,14 @@ Sub Get_CardsNumb()
 数据的严谨与准确性， 程序的私有性
 按销售人员统计，图表，默认是开筛选的
 
+
+    Msgbox "Finished!"
 End Sub
 
 
+Sub Get_Max()
+    
+
+End Sub
+
+Sub 
