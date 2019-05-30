@@ -90,8 +90,8 @@ Sub Unified_Format()
     ActiveWindow.ActivePane.VerticalPercentScrolled = 0
 
     '删除掉多余的空行、手动分页符、Tab更换为空格
-    Initial_Symbol_Arr = Array("^p^p^p","^b","_","	u/L","	%","	mmol/L","^tmmol/L","	u","^t%","FPG^t","PPG^t")
-    Treated_SymbolP_Arr = Array("^p^p","^p",""," u/L"," %"," mmol/L"," mmol/L"," u"," %","FPG ","PPG ")
+    Initial_Symbol_Arr = Array("^p^p^p^p","^p^p^p","^b","_","	u/L","	%","	mmol/L","^tmmol/L","	u","^t%","FPG^t","PPG^t","   ","^t0")
+    Treated_SymbolP_Arr = Array("^p","^p","^p",""," u/L"," %"," mmol/L"," mmol/L"," u"," %","FPG ","PPG "," "," 0")
 
     For i = 0 TO UBound(Initial_Symbol_Arr)
         Selection.WholeStory
@@ -202,10 +202,30 @@ Sub Normalize_Sentences()
     Dim Bad_Sentences_Arr, Good_Sentences_Arr
 
     Bad_Sentences_Arr = Array("饮食习惯等 生 活 方 式 改 变 时 ， 必 要 时 胰 岛 素 剂 量 也 应 随 之 调 整", _
-                            )
+                            "种类^p有","降幅^p为","糖尿病^p肾病","mmol^p／L","原因^p为")
     
-    Good_Sentences_Arr = Array("饮食习惯等生活方式改变时，必要时胰岛素剂量也应随之调整", _)
+    Good_Sentences_Arr = Array("饮食习惯等生活方式改变时，必要时胰岛素剂量也应随之调整","种类有","降幅为","糖尿病肾病","mmol／L", _
+                                "原因为")
     
+    For i = 0 TO UBound(Bad_Sentences_Arr)
+        Selection.WholeStory
+        Selection.Find.ClearFormatting
+        Selection.Find.Replacement.ClearFormatting
+        With Selection.Find
+            .Text = Bad_Sentences_Arr(i)
+            .Replacement.Text = Good_Sentences_Arr(i)
+            .Forward = True
+            .Wrap = wdFindAsk
+            .Format = False
+            .MatchCase = False
+            .MatchWholeWord = False
+            .MatchByte = True
+            .MatchWildcards = False
+            .MatchSoundsLike = False
+            .MatchAllWordForms = False
+        End With
+        Selection.Find.Execute Replace:=wdReplaceAll
+    Next
 End Sub
 
 
