@@ -40,7 +40,12 @@ Sub Get_Report()
     MkDir Case_Folder
 
     For  i = 2 To lastRow_Temp
-        extensionName = Split(Right(Cells(i,7),6), ".")(1)
+        If Right(Cells(i, 7), 6) Like "*.*" Then
+            extensionName = Split(Right(Cells(i, 7), 6), ".")(1)
+        Else
+            MsgBox Cells(i, 1) & " 的文件无扩展名！"
+            Exit Sub
+        End If
         If Not extensionName like "*doc*" Then
             Msgbox Cells(i,1) & " 的文件格式不是Word文件！"
             Exit Sub
