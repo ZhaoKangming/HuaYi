@@ -34,6 +34,7 @@ Sub MoveReport()
         msgtest = "已经将文件 " & myName & " 删除！"
         MsgBoxTimeOut 0, msgtest, "提示", 64, 0, 300
     End If
+    Application.WindowState = wdWindowStateMinimize  '最小化窗体
 End Sub
 
 

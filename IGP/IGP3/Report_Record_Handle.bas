@@ -132,6 +132,7 @@ Sub Copy_Info()
     dst_sht.Cells(dst_lastrow + 1, 5).Select
     Set dst_sht = Nothing
     Call AutoClose
+    Application.WindowState = wdWindowStateMinimize
 End Sub
 
 Sub Copy_Wrong_Info()
