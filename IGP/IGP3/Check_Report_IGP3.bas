@@ -91,8 +91,10 @@ Sub Unified_Format()
     ActiveWindow.ActivePane.VerticalPercentScrolled = 0
 
     '删除掉多余的空行、手动分页符、Tab更换为空格
-    Initial_Symbol_Arr = Array("^p^p^p^p","^p^p^p","^b","_","	u/L","	%","	mmol/L","^tmmol/L","	u","^t%","FPG^t","PPG^t","   ","^t0")
-    Treated_SymbolP_Arr = Array("^p","^p","^p",""," u/L"," %"," mmol/L"," mmol/L"," u"," %","FPG ","PPG "," "," 0")
+    Initial_Symbol_Arr = Array("^p^p^p^p","^p^p^p","^b","_","	u/L","	%","	mmol/L","^tmmol/L","	u","^t%","FPG^t","PPG^t","   ","^t0", _
+                            "；（5）其他：     ")
+    Treated_SymbolP_Arr = Array("^p","^p","^p",""," u/L"," %"," mmol/L"," mmol/L"," u"," %","FPG ","PPG "," "," 0", _
+                            "")
 
     For i = 0 TO UBound(Initial_Symbol_Arr)
         Selection.WholeStory
@@ -133,7 +135,8 @@ Sub Delete_Prompt_Text()
                             "（此处建议您描述本次临床实践中有关剂量滴定的部分与指南的差异，并说明为什么会存在这种差异，如何解决）^p", _
                             "（此处建议您说明经过 3 个月的治疗情况，可阐述多少比例的患者血糖达到目标值，可总结出什么经验，如联合用药、患者依从性及自我管理等。）^p", _
                             "（可从患者教育、联合用药、患者自我管理、生活方式等方面进行描述）", _
-                            "（此处请就您上述报告内容进行小结）^p")
+                            "（此处请就您上述报告内容进行小结）^p", _
+                            "（此处请就您上述报告内容进行小结）")
     For i = 0 TO UBound(Prompt_Text_Arr)
         Selection.WholeStory
         Selection.Find.ClearFormatting
