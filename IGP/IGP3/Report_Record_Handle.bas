@@ -156,6 +156,7 @@ Public Sub AutoClose()
     '过程,"弹出对话","对话框标题",图标类型,默认参数,N毫秒后自动关闭
     MsgBoxTimeOut 0, "录入完毕!!", "提示", 64, 0, 300
 End Sub
+
 Sub Delete_Row2()
     Rows(2).Delete
 End Sub
