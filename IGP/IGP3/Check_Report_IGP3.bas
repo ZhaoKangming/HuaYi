@@ -156,6 +156,7 @@ End Sub
 
 Sub Check_Integrity()
 '【功能】检查文档各部分的完整性
+'TODO:治疗3个月/HbA1c目标，如果3/HbA1c前后的空格删除了，则会误以为缺少此部分，这个bug需要修复
     Dim i%, j%, Content_Arr, Missing_Sections$
     Content_Arr = Array("分析方法", _
                         "患者情况汇总", _
@@ -274,6 +275,7 @@ Sub Count_Words()
             .SetText "总结部分字数不够200字", 13 '这个13代表的Unicode字符集，这个参数至关重要
             .PutInClipboard
         End With
+        'TODO:把总结字数不足粘贴进剪切板
         MsgBox "总结部分字数不够200字"
     End If
     ' sWordsCnt = ActiveDocument.Range.ComputeStatistics(wdStatisticWords)

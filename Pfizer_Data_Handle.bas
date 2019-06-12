@@ -82,12 +82,11 @@ Sub Pfizer_Data_Handle()
     End With
 
 
-
     '---------------- 随机拆分多出的医院数 ---------------
     'TODO:每周至少有几个增加的
     Dim UpNumb%, Sum_Temp%
     Dim Rnd_Arr(6) As Integer
-    UpNumb = [C7] - [F9]
+    UpNumb = [C7]
     Randomize  '防止每次生出随机数一样
     
     For i = 0 To 5
