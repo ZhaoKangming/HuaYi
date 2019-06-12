@@ -20,7 +20,7 @@ Sub Check_Report()
     Application.DisplayAlerts = True
     ActiveWindow.ActivePane.VerticalPercentScrolled = 0  '将光标移动到文章开头
     ActiveDocument.Save
-    Msgbox "报告审核完成！"
+    MsgBoxTimeOut 0, "报告审核完毕!", "提示", 64, 0, 300
 End Sub
 
 Sub Replace_Product_Name()

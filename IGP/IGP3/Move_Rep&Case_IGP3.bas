@@ -1,5 +1,46 @@
+Public Declare PtrSafe Function MsgBoxTimeOut Lib "user32" Alias "MessageBoxTimeoutA" (ByVal hwnd As Long, ByVal lpText As String, ByVal lpCaption As String, ByVal wType As Long, ByVal wlange As Long, ByVal dwTimeout As Long) As Long 'AutoClose
+
 Sub MoveReport()
-    Dim myFile$, myName$, myNewFilePath$, Result&, Wrong&, dt$
+    Dim myFile$, myName$, myNewFilePath$, Result&, Wrong&, dt$, msgtest$
+    Dim fso As Scripting.FileSystemObject
+
+    'TODO:区分病例与报告：取路径分析
+    ActiveDocument.Save
+    myName = ActiveDocument.Name
+    myFile = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\桌面\" & Right(ActiveDocument.Path, 2) & "\" & myName   '要移动的文件
+    Result = MsgBox("该报告是否合格？", vbYesNo + vbQuestion + vbDefaultButton1, "报告分类")
+    Application.ScreenUpdating = False
+
+    If Result = vbYes Then
+        myNewFilePath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\文档\华医网\赋能起航\报告病例审核\合格" & Right(ActiveDocument.Path, 2) & "\" '要移动的位置
+        Set fso = New Scripting.FileSystemObject
+        ActiveDocument.Save
+        ActiveWindow.Close
+
+        If fso.FileExists(myFile) Then
+            fso.MoveFile myFile, myNewFilePath
+            msgtest = "已经将文件 " & myName & " 移到了 #合格# 文件夹中"
+            MsgBoxTimeOut 0, msgtest, "提示", 64, 0, 300
+        Else
+            Wrong = MsgBox("要移动的文件不存在", vbCritical, "移动失败")
+            Exit Sub
+        End If
+
+        Set fso = Nothing
+    Else
+        ActiveDocument.Save
+        ActiveWindow.Close
+        Kill myFile
+        msgtest = "已经将文件 " & myName & " 删除！"
+        MsgBoxTimeOut 0, msgtest, "提示", 64, 0, 300
+    End If
+End Sub
+
+
+
+' 以下部分为之前的 idea
+Sub MoveReport()
+    Dim myFile$, myName$, myNewFilePath$, Result&, Wrong&, dt$, msgtest$
     Dim fso As Scripting.FileSystemObject
     Dim ExcelObject As Object, FindName$, Rng As Excel.Range, rownum&, Reason$
 
@@ -18,7 +59,7 @@ Sub MoveReport()
 
         If fso.FileExists(myFile) Then
             fso.MoveFile myFile, myNewFilePath
-            MsgBox "已经将文件 " & myName & " 移到了 #合格# 文件夹中"
+            
             '先在word vba工具-引用中选中Ms Excel，才能利用VBA操作excel
 
             Set ExcelObject = CreateObject("Excel.Application") '用set来创建Excel对象，运行Excel程序
