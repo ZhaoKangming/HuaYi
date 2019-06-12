@@ -1,6 +1,7 @@
+Public Declare PtrSafe Function MsgBoxTimeOut Lib "user32" Alias "MessageBoxTimeoutA" (ByVal hwnd As Long, ByVal lpText As String, ByVal lpCaption As String, ByVal wType As Long, ByVal wlange As Long, ByVal dwTimeout As Long) As Long 'AutoClose
+
 Sub Check_Report()
-    
-'TODO:有人会修改标题，可能查不到 项目报告，或者在项目报告前面还有字符
+
 'TODO:确定是否是往年的报告
 
     Application.ScreenUpdating = False
