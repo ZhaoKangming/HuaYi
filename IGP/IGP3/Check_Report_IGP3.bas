@@ -207,10 +207,10 @@ Sub Normalize_Sentences()
     Dim Bad_Sentences_Arr, Good_Sentences_Arr
 
     Bad_Sentences_Arr = Array("饮食习惯等 生 活 方 式 改 变 时 ， 必 要 时 胰 岛 素 剂 量 也 应 随 之 调 整", _
-                            "种类^p有","降幅^p为","糖尿病^p肾病","mmol^p／L","原因^p为")
+                            "种类^p有","降幅^p为","糖尿病^p肾病","mmol^p／L","原因^p为","；（7）其他：")
     
     Good_Sentences_Arr = Array("饮食习惯等生活方式改变时，必要时胰岛素剂量也应随之调整","种类有","降幅为","糖尿病肾病","mmol／L", _
-                                "原因为")
+                                "原因为","")
     
     For i = 0 TO UBound(Bad_Sentences_Arr)
         Selection.WholeStory
@@ -279,7 +279,6 @@ Sub Count_Words()
             .SetText "总结部分字数不够200字", 13 '这个13代表的Unicode字符集，这个参数至关重要
             .PutInClipboard
         End With
-        'TODO:把总结字数不足粘贴进剪切板
         MsgBox "总结部分字数不够200字"
     End If
     ' sWordsCnt = ActiveDocument.Range.ComputeStatistics(wdStatisticWords)
