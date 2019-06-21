@@ -14,8 +14,8 @@ Sub Pfizer_Data_Handle()
         Msgbox "Cannot find the workbook!"
         Exit Sub
     End If
-    Src_Wkb = Workbooks(ActiveWorkbook.Name)
-    Dst_Wkb = Workbooks("辉瑞-DataTool.xlsm")
+    Set Src_Wkb = Workbooks(ActiveWorkbook.Name)
+    Set Dst_Wkb = Workbooks("辉瑞-DataTool.xlsm")
 
     '---------------- 数据清洗 --------------
     '清洗孙旭辰这个测试账号的信息
@@ -24,7 +24,7 @@ Sub Pfizer_Data_Handle()
     ' 方法1：复制所有医生的行
     Sheets.Add(After:=Sheets(3)).Name = "DocData"
     Sheets("Sheet2").Activate
-    RowNumbs = Sheets("Sheet1").[a1048576].End(xlUp).Row
+    RowNumbs = Sheets("Sheet2").[a1048576].End(xlUp).Row
     ActiveSheet.UsedRange.AutoFilter Field:=13, Criteria1:="医生"
     Range([b2],Cells(RowNumbs,13)).Copy
     Sheets("Sheet2").AutoFilterMode = False
@@ -47,8 +47,17 @@ Sub Pfizer_Data_Handle()
 
     '---------------- 一些数据统计 --------------
     Dim ZR_Numb%, FZR_Numb%, ZZ_Numb%, YS_Numb%
-
-
+    For i = 1 To [a999999].End(xlUp).Row
+        If Cells(i, 1) Like "*副*" Then
+            FZR_Numb = FZR_Numb + 1
+        ElseIf Cells(i, 1) Like "*主任*" Then
+            ZR_Numb = ZR_Numb + 1
+        ElseIf Cells(i, 1) Like "*主治*" Then
+            ZZ_Numb = ZZ_Numb + 1
+        Else
+            YS_Numb = YS_Numb + 1
+        End If
+    Next
 
 
 
@@ -87,11 +96,11 @@ Sub Pfizer_Data_Handle()
         .[C10:C16].ClearContents
 
         '数据统计:职称分布
-        .[D3] = ZR_Numb
-        .[D4] = FZR_Numb
-        .[D5] = ZZ_Numb
-        .[D6] = YS_Numb
-        .[D7] = RowNumbs
+        ' .[D3] = ZR_Numb
+        ' .[D4] = FZR_Numb
+        ' .[D5] = ZZ_Numb
+        ' .[D6] = YS_Numb
+        ' .[D7] = RowNumbs
 
         '数据统计:医院分布
         Dim UpNumb%, Sum_Temp%, Rnd_Arr(6) As Integer
@@ -134,6 +143,17 @@ time、person_id、Project_id
 
 'TODO:核对统计的正确性
 
+鼠标位置
+省份如果有增加
+
+清除由于增加列导致的新列多余的条件格式
+另存为xlsx
+
+    Src_Wkb.Save
+    Dst_Wkb.Save
+    Set Src_Wkb = Nothing
+    Set Dst_Wkb = Nothing
+    Msgbox "数据统计完成！"
 End Sub
 
 
