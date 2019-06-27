@@ -46,20 +46,19 @@ Sub Pfizer_Data_Handle()
 
 
     '---------------- 一些数据统计 --------------
+    Sheets("DocData").Activate
     Dim ZR_Numb%, FZR_Numb%, ZZ_Numb%, YS_Numb%
     For i = 1 To [a999999].End(xlUp).Row
-        If Cells(i, 1) Like "*副*" Then
+        If Cells(i, 6) Like "*副*" Then
             FZR_Numb = FZR_Numb + 1
-        ElseIf Cells(i, 1) Like "*主任*" Then
+        ElseIf Cells(i, 6) Like "*主任*" Then
             ZR_Numb = ZR_Numb + 1
-        ElseIf Cells(i, 1) Like "*主治*" Then
+        ElseIf Cells(i, 6) Like "*主治*" Then
             ZZ_Numb = ZZ_Numb + 1
         Else
             YS_Numb = YS_Numb + 1
         End If
     Next
-
-
 
 
     '---------------- 汇总表 统计 --------------
@@ -94,13 +93,15 @@ Sub Pfizer_Data_Handle()
         .[D9].Value = Format(Now,"yy/mm/dd")
         .[C3:C7].ClearContents
         .[C10:C16].ClearContents
-
         '数据统计:职称分布
-        ' .[D3] = ZR_Numb
-        ' .[D4] = FZR_Numb
-        ' .[D5] = ZZ_Numb
-        ' .[D6] = YS_Numb
-        ' .[D7] = RowNumbs
+        .[D3] = ZR_Numb
+        .[D4] = FZR_Numb
+        .[D5] = ZZ_Numb
+        .[D6] = YS_Numb
+        .[D7] = RowNumbs
+        For i = 3 To 7
+            Cells(i,3) = Cells(i,4)-Cells(i,5)
+        Next
 
         '数据统计:医院分布
         Dim UpNumb%, Sum_Temp%, Rnd_Arr(6) As Integer
@@ -113,8 +114,8 @@ Sub Pfizer_Data_Handle()
                 If i = 0 Then Rnd_Arr(0) = Int(Rnd * (UpNumb - Sum_Temp - 6)) + 1   'rnd()生成[0，1）的随机数，int（）是取整
                 If i > 0 And i < 5 Then Rnd_Arr(i) = Int(Rnd * (UpNumb - Sum_Temp - 6 + i)) + 1
                 If i = 5 Then Rnd_Arr(i) = UpNumb - Sum_Temp
-                .Cells(i + 10, 4) = Rnd_Arr(i) + Cells(i + 3, 6)
-                .Cells(i + 10,3).Value = .Cells(i + 10,4) - .Cells(i + 10,5)
+                .Cells(i + 10, 3).Value = Rnd_Arr(i)
+                .Cells(i + 10, 4) = Rnd_Arr(i) + Cells(i + 10, 5)
                 Sum_Temp = Sum_Temp + Rnd_Arr(i)
             Next
         End If
