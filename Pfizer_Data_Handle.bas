@@ -1,6 +1,5 @@
 Sub Pfizer_Data_Handle()
     Application.ScreenUpdating = False
-    
 
     Dim i%, Src_Wkb As Workbook, Dst_Wkb As Workbook
     Dim Temp_Dict As object
@@ -8,23 +7,37 @@ Sub Pfizer_Data_Handle()
 
     '---------------- 切换数据表 --------------
     For i = 1 To Workbooks.Count
-        If Workbooks(i).Name like "*辉瑞统计*" Then Workbooks(i).Activate       
+        If Workbooks(i).Name like "*辉瑞*" Then Workbooks(i).Activate       
     Next
-    If Not ActiveWorkbook.Name like "*辉瑞统计*" Then 
+    If Not ActiveWorkbook.Name like "*辉瑞*" Then 
         Msgbox "Cannot find the workbook!"
         Exit Sub
     End If
     Set Src_Wkb = Workbooks(ActiveWorkbook.Name)
-    Set Dst_Wkb = Workbooks("辉瑞-DataTool.xlsm")
+    Set Dst_Wkb = Workbooks("Pfizer-DataTool.xlsm")
 
     '---------------- 数据清洗 --------------
     '清洗孙旭辰这个测试账号的信息
+    Sheets("Sheet2").Activate
+    RowNumbs = Sheets("Sheet2").[a1048576].End(xlUp).Row
+    [C:C].Replace "(**)",""
+    For i = 2 To RowNumbs
+        If Cells(i,5) = "孙旭辰" Then 
+            Cells(i,13) = "测试"
+            Exit for
+        End if
+    Next
+
+    '---------------- Sheet1 文本转数值 --------------
+    With Sheets("Sheet1").Rows(2)
+        .NumberFormatLocal = "G/通用格式"   '把单元格设置为常规
+        .Value = .Value   '取值
+    End With
 
     '---------------- 生成医生工作表 --------------
     ' 方法1：复制所有医生的行
     Sheets.Add(After:=Sheets(3)).Name = "DocData"
     Sheets("Sheet2").Activate
-    RowNumbs = Sheets("Sheet2").[a1048576].End(xlUp).Row
     ActiveSheet.UsedRange.AutoFilter Field:=13, Criteria1:="医生"
     Range([b2],Cells(RowNumbs,13)).Copy
     Sheets("Sheet2").AutoFilterMode = False
@@ -48,7 +61,8 @@ Sub Pfizer_Data_Handle()
     '---------------- 一些数据统计 --------------
     Sheets("DocData").Activate
     Dim ZR_Numb%, FZR_Numb%, ZZ_Numb%, YS_Numb%
-    For i = 1 To [a999999].End(xlUp).Row
+    ' 医生职称的统计
+    For i = 1 To RowNumbs
         If Cells(i, 6) Like "*副*" Then
             FZR_Numb = FZR_Numb + 1
         ElseIf Cells(i, 6) Like "*主任*" Then
@@ -59,6 +73,17 @@ Sub Pfizer_Data_Handle()
             YS_Numb = YS_Numb + 1
         End If
     Next
+    ' 省份、城市数量的统计
+    Dim PvcDict As Object, CityDict As Object, Last_PvcNumb%, Last_CityNumb%
+    Set PvcDict = CreateObject("scripting.dictionary")
+    Set CityDict = CreateObject("scripting.dictionary")
+    For i = 1 To RowNumbs
+        If Cells(i,1) <> "" And Not PvcDict.exists(Cells(i,1).Value) Then PvcDict(Cells(i,1).Value)= Cells(i,1).Value
+        Cells(i,13) = Cells(i,1) & Cells(i,2)
+        If Cells(i,13) <> "" And Not CityDict.exists(Cells(i,13).Value) Then CityDict(Cells(i,13).Value)= Cells(i,13).Value
+    Next
+    Last_PvcNumb = PvcDict.Count
+    Last_CityNumb = CityDict.Count
 
 
     '---------------- 汇总表 统计 --------------
@@ -83,6 +108,7 @@ Sub Pfizer_Data_Handle()
             .Cells(i,4)= Src_Wkb.Sheets("Sheet1").Cells(2,i-10)
             .Cells(i,3).Value = .Cells(i,4) - .Cells(i,5)
         Next
+        .[D:D].FormatConditions.Delete
     End With
 
     '---------------- 职称与医院分布表 统计 --------------
@@ -100,7 +126,7 @@ Sub Pfizer_Data_Handle()
         .[D6] = YS_Numb
         .[D7] = RowNumbs
         For i = 3 To 7
-            Cells(i,3) = Cells(i,4)-Cells(i,5)
+            .Cells(i,3) = .Cells(i,4) - .Cells(i,5)
         Next
 
         '数据统计:医院分布
@@ -115,46 +141,86 @@ Sub Pfizer_Data_Handle()
                 If i > 0 And i < 5 Then Rnd_Arr(i) = Int(Rnd * (UpNumb - Sum_Temp - 6 + i)) + 1
                 If i = 5 Then Rnd_Arr(i) = UpNumb - Sum_Temp
                 .Cells(i + 10, 3).Value = Rnd_Arr(i)
-                .Cells(i + 10, 4) = Rnd_Arr(i) + Cells(i + 10, 5)
+                .Cells(i + 10, 4) = Rnd_Arr(i) + .Cells(i + 10, 5)
                 Sum_Temp = Sum_Temp + Rnd_Arr(i)
             Next
         End If
         .[D16] = RowNumbs
+        .[C16] = .[C7]
     End With
 
 '---------------- 省份分布表 统计 --------------
 'TODO:省份按照卡数的多少来进行排序
-    Dim PvcNumb%, 
+    Dim PvcNumb%
     With Dst_Wkb.Sheets("省份分布")
+        .Columns(5).EntireColumn.Insert
+        .[E2].Value = Format(Now,"yy/mm/dd")
         PvcNumb = .[c1048576].End(xlUp).Row - 7
-    
-
+        If PvcNumb > Last_PvcNumb Then
+            Msgbox "本周有新增的省份！"
+        Elseif PvcNumb < Last_PvcNumb Then
+            Msgbox "省份减少，统计有错误，请注意！"
+        Elseif PvcNumb = Last_PvcNumb Then
+            For i = 3 To .[c1048576].End(xlUp).Row
+                'TODO:每次增加新省份=便需要重新改下面的数字
+                Select Case i
+                    Case Is = 9 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E3:E88])
+                    Case Is = 19 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E10:E18])
+                    Case Is = 23 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E20:E22])
+                    Case Is = 27 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E24:E26])
+                    Case Is = 32 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E28:E31])
+                    Case Else : .Cells(i,5) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[A:A], .Cells(i, 3))
+                End Select
+                .Cells(i,4) = .Cells(i,5) - .Cells(i,6)
+            Next
+        End If
+        .[E:E].FormatConditions.Delete
     End With 
 
 '---------------- 城市分布表 统计 --------------
 'TODO:注意每个省份的城市数量是否有数量的增减
-    Dim CityNumb%, 
+'TODO:原先有，现在没按照0来统计
+    Dim CityNumb%
     With Dst_Wkb.Sheets("城市分布")
-
-
+        .Columns(6).EntireColumn.Insert
+        .[F2].Value = Format(Now,"yy/mm/dd")
+        CityNumb = .[d1048576].End(xlUp).Row - 2
+        If CityNumb > Last_CityNumb Then
+            Msgbox "本周有新增的城市！"
+        Elseif CityNumb < Last_CityNumb Then
+            Msgbox "城市减少，统计有错误，请注意！"
+        Elseif CityNumb = Last_CityNumb Then
+            For i = 3 To .[c1048576].End(xlUp).Row
+                .Cells(i,6) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[M:M], .Cells(i, 3) & .Cells(i, 4))
+                .Cells(i,5) = .Cells(i,6) - .Cells(i,7)
+            Next
+        End If
+        .[F:F].FormatConditions.Delete
     End With
 
-改text1的font属性，改字号的
-time、person_id、Project_id
+' 改text1的font属性，改字号的
+' time、person_id、Project_id
 
 'TODO:核对统计的正确性
+'TODO:发生了减少需要记录检测
 
-鼠标位置
-省份如果有增加
+' 另存为xlsx
+'---------------- 选中每个表的B2单元格 ----------------
+    For i = 1 To Dst_Wkb.Worksheets.Count
+        Dst_Wkb.Worksheets(i).Activate
+        [B2].Select
+    Next
+    Worksheets("汇总").Activate
 
-清除由于增加列导致的新列多余的条件格式
-另存为xlsx
 
     Src_Wkb.Save
     Dst_Wkb.Save
     Set Src_Wkb = Nothing
     Set Dst_Wkb = Nothing
+    Set PvcDict = Nothing
+    Set CityDict = Nothing
     Msgbox "数据统计完成！"
+    Application.ScreenUpdating = True
 End Sub
 
 

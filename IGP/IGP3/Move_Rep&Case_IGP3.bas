@@ -11,6 +11,11 @@ Sub MoveReport()
     Result = MsgBox("该报告是否合格？", vbYesNo + vbQuestion + vbDefaultButton1, "报告分类")
     Application.ScreenUpdating = False
 
+    With CreateObject("new:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")
+        .SetText Left(myName,Instr(myName,".")-1), 13 '这个13代表的Unicode字符集，这个参数至关重要
+        .PutInClipboard
+    End With
+
     If Result = vbYes Then
         myNewFilePath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\文档\华医网\赋能起航\报告病例审核\合格" & Right(ActiveDocument.Path, 2) & "\" '要移动的位置
         Set fso = New Scripting.FileSystemObject
@@ -34,70 +39,14 @@ Sub MoveReport()
         msgtest = "已经将文件 " & myName & " 删除！"
         MsgBoxTimeOut 0, msgtest, "提示", 64, 0, 300
     End If
+    
     Application.WindowState = wdWindowStateMinimize  '最小化窗体
 End Sub
 
 
 
-' 以下部分为之前的 idea
-Sub MoveReport()
-    Dim myFile$, myName$, myNewFilePath$, Result&, Wrong&, dt$, msgtest$
-    Dim fso As Scripting.FileSystemObject
-    Dim ExcelObject As Object, FindName$, Rng As Excel.Range, rownum&, Reason$
 
-    'TODO:区分病例与报告：取路径分析
-    ActiveDocument.Save
-    myName = ActiveDocument.Name
-    Result = MsgBox("该报告是否合格？", vbYesNo + vbQuestion + vbDefaultButton1, "报告分类")
-    Application.ScreenUpdating = False
 
-    If Result = vbYes Then
-        myFile = ActiveDocument.Path & "\" & myName  '要移动的文件
-        myNewFilePath = "C:\Users\ZhaoKangming\OneDrive - cnu.edu.cn\文档\华医网\赋能起航\报告病例审核\合格" & Right(ActiveDocument.Path,2) & "\" '要移动的位置
-        Set fso = New Scripting.FileSystemObject
-        ActiveDocument.Save
-        ActiveWindow.Close
-
-        If fso.FileExists(myFile) Then
-            fso.MoveFile myFile, myNewFilePath
-            
-            '先在word vba工具-引用中选中Ms Excel，才能利用VBA操作excel
-
-            Set ExcelObject = CreateObject("Excel.Application") '用set来创建Excel对象，运行Excel程序
-            ExcelObject.Visible = 0 '前台运行Excel对象，若只在后台运行进程，在任务栏上不显示，可设置为0
-            ExcelObject.Workbooks.Open FileName:="C:\Users\joke\Desktop\华医网\IGP2.0\报告审核\IGP2.0报告审核.xlsx"
-            'Excel.Application.Sheets(1).Activate
-            FindName = Split(myName, ".")(0)
-
-            Set Rng = Sheets("报告（全部）").Columns("M").Find(FindName, lookat:=xlWhole)
-
-            If Not Rng Is Nothing Then
-                rownum = Excel.Application.Rng.row
-                Cells(rownum,10) = "合格"
-                Workbooks("IGP2.0报告审核.xlsx").Save
-                Application.WindowState = wdWindowStateMinimize
-            Else
-                Msgbox "错误！没找到该同名位置！"
-            End If
-
-        Else
-            Wrong = MsgBox("要移动的文件不存在", vbCritical, "移动失败")
-        End If
-
-        Set fso = Nothing
-    Else
-        myFile = "C:\Users\joke\Desktop\华医网\IGP2.0\报告审核\报告原文\" & dt & "\" & myName '要移动的文件
-        myNewFilePath = "C:\Users\joke\Desktop\华医网\IGP2.0\报告审核\" & dt & "\不合格\"  '要移动的位置
-        ActiveDocument.Save
-        ActiveWindow.Close
-        FileCopy myFile, myNewFilePath & myName
-        Kill "C:\Users\joke\Desktop\" & myName
-        MsgBox "已经将报告原文件移到了 #不合格# 文件夹中"
-
-        Set ExcelObject = CreateObject("Excel.Application") '用set来创建Excel对象，运行Excel程序
-        ExcelObject.Visible = 1 '前台运行Word对象，若只在后台运行进程，在任务栏上不显示，可设置为0
-        ExcelObject.Workbooks.Open FileName:="C:\Users\joke\Desktop\华医网\IGP2.0\报告审核\IGP2.0报告审核.xlsx"
-        Excel.Application.Sheets(1).Activate
         FindName = Split(myName, ".")(0)
         Set Rng = Sheets("报告（全部）").Columns("M").Find(FindName, lookat:=xlWhole)
 
@@ -117,6 +66,7 @@ Sub MoveReport()
 '要考虑到一份报告可能有多个不合格原因
     
     'Application.WindowState = wdWindowStateMinimize    '最小化word窗体，返回桌面
+Sub OpenNewFile()
 '打开指定文件夹中的第一个文件
 Dim doc_numb%, File As Object, doc As Document, WdFile$
     doc_numb = 0
