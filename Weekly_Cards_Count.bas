@@ -7,19 +7,17 @@ Sub Get_CardsNumb()
     '表格样式设置，字体，列宽，字号，对齐等，冻结首行
     ' 百分比，条件格式，进度预警，颜色变化
     ' 省市的增长进度的突然增加预警
-    ' 广东，山西，海南，四川，百分比排序
-    ' 数据的严谨与准确性， 程序的私有性
     ' 按销售人员统计，图表，默认是开筛选的
-    ' 增长刷超过200的进行提示
+    ' 增长刷超过150的进行提示，Max值
 
     Dim i%, Src_Wkb As workbook, Dst_Wkb As workbook, RowNumbs%
     Dim Temp_Dict As object
 
     '------------------- 切换工作表 -------------------
     For i = 1 To Workbooks.Count
-        If Workbooks(i).Name like "*学习卡*" Then Workbooks(i).Activate       
+        If Workbooks(i).Name like "*药企*" Then Workbooks(i).Activate       
     Next
-    If Not ActiveWorkbook.Name like "*学习卡*" Then 
+    If Not ActiveWorkbook.Name like "*药企*" Then 
         Msgbox "Cannot find the workbook!"
         Exit Sub
     End If

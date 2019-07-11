@@ -79,7 +79,7 @@ Sub Pfizer_Data_Handle()
     Set CityDict = CreateObject("scripting.dictionary")
     For i = 1 To RowNumbs
         If Cells(i,1) <> "" And Not PvcDict.exists(Cells(i,1).Value) Then PvcDict(Cells(i,1).Value)= Cells(i,1).Value
-        Cells(i,13) = Cells(i,1) & Cells(i,2)
+        Cells(i,13) = Cells(i,1) & "-" & Cells(i,2)
         If Cells(i,13) <> "" And Not CityDict.exists(Cells(i,13).Value) Then CityDict(Cells(i,13).Value)= Cells(i,13).Value
     Next
     Last_PvcNumb = PvcDict.Count
@@ -180,21 +180,42 @@ Sub Pfizer_Data_Handle()
 '---------------- 城市分布表 统计 --------------
 'TODO:注意每个省份的城市数量是否有数量的增减
 'TODO:原先有，现在没按照0来统计
-    Dim CityNumb%
+营口和安阳之前有，现在没有了，注意这个问题
+    Dim CityNumb%, Orig_CityDict As Object, TempNewPvc$, TempNewCity$, PvcRow%, j%
+    Set Orig_CityDict = CreateObject("scripting.dictionary")
     With Dst_Wkb.Sheets("城市分布")
         .Columns(6).EntireColumn.Insert
         .[F2].Value = Format(Now,"yy/mm/dd")
         CityNumb = .[d1048576].End(xlUp).Row - 2
         If CityNumb > Last_CityNumb Then
-            Msgbox "本周有新增的城市！"
+            For i = 3 To .[b1048576].End(xlUp).Row - 1
+                If .Cells(i,3) <> "" And Not Orig_CityDict.exists(.Cells(i,3).Value) Then Orig_CityDict(.Cells(i,3).Value)= .Cells(i,3).Value
+            Next
+            For i = 0 To CityDict.Count -1
+                If Not Orig_CityDict.exists(CityDict(i)) Then 
+                    Msgbox "本周有新增城市 --- " & CityDict(i)
+                    TempNewPvc = Split(CityDict(i), "-")(0)
+                    TempNewCity = Split(CityDict(i), "-")(1)
+                    PvcRow = .[B:B].Find(TempNewPvc, lookat:=xlWhole).Row
+                    .Rows(PvcRow + 1).EntireRow.Insert
+                    .Cells(PvcRow + 1,3) = CityDict(i)
+                    .Cells(PvcRow + 1,4) = TempNewCity
+                    For j = 7 To .Cells(2,256).End(xlToLeft).Column
+                        .Cells(PvcRow,j) = 0
+                    Next
+
+                End If 
+            Next
+            
         Elseif CityNumb < Last_CityNumb Then
             Msgbox "城市减少，统计有错误，请注意！"
-        Elseif CityNumb = Last_CityNumb Then
-            For i = 3 To .[c1048576].End(xlUp).Row
-                .Cells(i,6) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[M:M], .Cells(i, 3) & .Cells(i, 4))
-                .Cells(i,5) = .Cells(i,6) - .Cells(i,7)
-            Next
         End If
+
+        For i = 3 To .[c1048576].End(xlUp).Row
+            .Cells(i,6) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[M:M], .Cells(i, 3))
+            .Cells(i,5) = .Cells(i,6) - .Cells(i,7)
+        Next
+        
         .[F:F].FormatConditions.Delete
     End With
 
@@ -219,6 +240,7 @@ Sub Pfizer_Data_Handle()
     Set Dst_Wkb = Nothing
     Set PvcDict = Nothing
     Set CityDict = Nothing
+    Set Orig_CityDict = Nothing
     Msgbox "数据统计完成！"
     Application.ScreenUpdating = True
 End Sub
