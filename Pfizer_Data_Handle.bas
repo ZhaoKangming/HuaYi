@@ -180,7 +180,7 @@ Sub Pfizer_Data_Handle()
 '---------------- 城市分布表 统计 --------------
 'TODO:注意每个省份的城市数量是否有数量的增减
 'TODO:原先有，现在没按照0来统计
-营口和安阳之前有，现在没有了，注意这个问题
+ 营口和安阳之前有，现在没有了，注意这个问题
     Dim CityNumb%, Orig_CityDict As Object, TempNewPvc$, TempNewCity$, PvcRow%, j%
     Set Orig_CityDict = CreateObject("scripting.dictionary")
     With Dst_Wkb.Sheets("城市分布")
