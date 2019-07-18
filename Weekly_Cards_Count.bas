@@ -2,26 +2,23 @@ Sub Get_CardsNumb()
     Application.ScreenUpdating = False
 
     'TODO:检查市是否有增加？
-    '城市数据的统计
-    '导出的数据有些事文本格式需要转换成数字格式
-    '表格样式设置，字体，列宽，字号，对齐等，冻结首行
+    ' 城市数据的统计
+    ' 导出的数据有些事文本格式需要转换成数字格式
+    ' 表格样式设置，字体，列宽，字号，对齐等，冻结首行
     ' 百分比，条件格式，进度预警，颜色变化
     ' 省市的增长进度的突然增加预警
     ' 按销售人员统计，图表，默认是开筛选的
     ' 增长刷超过150的进行提示，Max值
 
-    Dim i%, Src_Wkb As workbook, Dst_Wkb As workbook, RowNumbs%
-    Dim Temp_Dict As object
-
+    Dim i%, Card_Wkb As workbook, Click_Wkb As workbook, Tool_Wkb As workbook, RowNumbs%
+    
     '------------------- 切换工作表 -------------------
     For i = 1 To Workbooks.Count
-        If Workbooks(i).Name like "*药企*" Then Workbooks(i).Activate       
+        If Workbooks(i).Name like "*药企*" Then Set Card_Wkb = Workbooks(Workbooks(i).Name) 
+        If Workbooks(i).Name like "*推广点开*" Then Set Click_Wkb = Workbooks(Workbooks(i).Name)
+        If Workbooks(i).Name like "*推广学习*" Then Set Learn_Wkb = Workbooks(Workbooks(i).Name)
+        If Workbooks(i).Name like "*HYCards*" Then Set Tool_Wkb = Workbooks(Workbooks(i).Name)        
     Next
-    If Not ActiveWorkbook.Name like "*药企*" Then 
-        Msgbox "Cannot find the workbook!"
-        Exit Sub
-    End If
-    Src_Wkb = Workbooks(ActiveWorkbook.Name)
 
     '------------------- 复制工作表并简单处理 -------------------
     Sheets("Sheet1").Copy Before:=Sheets("Sheet1")
@@ -101,12 +98,18 @@ Sub Get_CardsNumb()
 
     '------------------- 样式美化 -------------------
     '水平竖直居中
-    字体大小与字体
-    设置所有框线
+    ' 字体大小与字体
+    ' 设置所有框线
 
 
-    Src_Wkb.Save
-    Dst_Wkb.Save
+    Card_Wkb.Save
+    Click_Wkb.Save
+    Learn_Wkb.Save
+    Tool_Wkb.Save
+    Set Card_Wkb = Nothing
+    Set Click_Wkb = Nothing
+    Set Learn_Wkb = Nothing
+    Set Tool_Wkb = Nothing 
     Application.ScreenUpdating = True
     Msgbox "Finished!"
 End Sub
