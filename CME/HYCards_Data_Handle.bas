@@ -15,8 +15,6 @@ Sub Get_CardsNumb()
     '------------------- 切换工作表 -------------------
     For i = 1 To Workbooks.Count
         If Workbooks(i).Name like "*药企*" Then Set Card_Wkb = Workbooks(Workbooks(i).Name) 
-        If Workbooks(i).Name like "*推广点开*" Then Set Click_Wkb = Workbooks(Workbooks(i).Name)
-        If Workbooks(i).Name like "*推广学习*" Then Set Learn_Wkb = Workbooks(Workbooks(i).Name)
         If Workbooks(i).Name like "*HYCards*" Then Set Tool_Wkb = Workbooks(Workbooks(i).Name)        
     Next
 
@@ -38,25 +36,13 @@ Sub Get_CardsNumb()
         .Value = .Value   '取值
     End With
 
-    '------------------- 填写策略备注 -------------------
-    For i = 2 To LastRow
-        Select Case Cells(i,1)
-            Case Is = "海南省" : Cells(i,2) = "已停止投放"
-            Case Is = "四川省" : Cells(i,2) = "凉山州已停止投放"
-            Case Is = "河北省" : Cells(i,2) = "暂不投"
-            Case Is = "湖北省" : Cells(i,2) = "暂不投"
-            Case Is = "西藏自治区" : Cells(i,2) = "暂不投"
-        End Select
-    Next
+
 
     '------------------- 获取各省份限制数 -------------------
     
 
     '------------------- 获取剩余数、进度 -------------------
-    For i = 2 To LastRow
-        Cells(i,4) = Cells(i,3)-Application.WorksheetFunction.Sumif(Columns(1),Cells(i,1),Columns(8))
-        Cells(i,5) = (Cells(i,3)-Cells(i,4))/Cells(i,3)
-    Next
+
 
     进度如果>1,或者限制数为0的如何处理，新爆仓的怎么办
     保留两位小数
@@ -72,20 +58,6 @@ Sub Get_CardsNumb()
     '------------------- 处理新表样式 -------------------
 
     '------------------- 合并单元格 -------------------
-    Application.DisplayAlerts = False
-    LastRow = Sheets("Sheet1").[a99999].End(xlUp).Row
-    
-    For i = LastRow - 1 To 2 Step -1
-        If Cells(i,1) = Cells(i-1,1) Then 
-            Range(Cells(i-1,1),Cells(i,1)).Merge
-            Range(Cells(i-1,2),Cells(i,2)).Merge
-            Range(Cells(i-1,3),Cells(i,3)).Merge  
-            Range(Cells(i-1,4),Cells(i,4)).Merge
-            Range(Cells(i-1,5),Cells(i,5)).Merge                  
-        End If
-    Next
-    Application.DisplayAlerts = True
-
 
     '------------------- 添加总计 -------------------
 
@@ -97,7 +69,7 @@ Sub Get_CardsNumb()
 
 
     '------------------- 样式美化 -------------------
-    '水平竖直居中
+    ' 水平竖直居中
     ' 字体大小与字体
     ' 设置所有框线
 
