@@ -18,28 +18,46 @@ Sub Get_CardsNumb()
         If Workbooks(i).Name like "*HYCards*" Then Set Tool_Wkb = Workbooks(Workbooks(i).Name)        
     Next
 
-    '------------------- 复制工作表并简单处理 -------------------
+    '------------------- 复制工作表并处理 -------------------
     Sheets("Sheet1").Copy Before:=Sheets("Sheet1")
     Sheets("Sheet1 (2)").Name = "TEMP"
     Sheets("TEMP").Activate
-    Columns(1).Delete
-    For i = 1 To 4
-        Columns(2).insert
-    Next
-    Columns(7).insert
-    RowNumbs = Sheets("TEMP").[a99999].End(xlUp).Row
-
-
-    '------------------- 将文本储存的数字转为数字 -------------------
-    With Columns(8)
-        .NumberFormatLocal = "G/通用格式"   '把单元格设置为常规
-        .Value = .Value   '取值
+    With Card_Wkb.Sheets("TEMP")
+        .Rows(1).Delete
+        With .Columns(1)
+            .ClearContents
+            .ColumnWidth = 45
+            .FormatConditions.AddUniqueValues
+            .FormatConditions(.FormatConditions.Count).SetFirstPriority
+            .FormatConditions(1).DupeUnique = xlDuplicate
+            With .FormatConditions(1).Font
+                .Color = -16383844
+                .TintAndShade = 0
+            End With
+            With .FormatConditions(1).Interior
+                .PatternColorIndex = xlAutomatic
+                .Color = 13551615
+                .TintAndShade = 0
+            End With
+            .FormatConditions(1).StopIfTrue = False
+        End With
+        .Columns(3).ColumnWidth = 35
+        With Columns(4)
+            .NumberFormatLocal = "G/通用格式"   '把单元格设置为常规
+            .Value = .Value   '取值
+        End With
+        RowNumbs = .[B99999].End(xlUp).Row
+        For i = 1 To RowNumbs
+            .Cells(i,1) = .Cells(i,2) & .Cells(i,3)
+        Next
     End With
 
 
-
-    '------------------- 获取各省份限制数 -------------------
-    
+    '------------------- 分析新增的地区卡项 -------------------
+    Tool_Wkb.Activate
+    With Tool_Wkb.Sheets("省份统计")
+        
+    End With
 
     '------------------- 获取剩余数、进度 -------------------
 
