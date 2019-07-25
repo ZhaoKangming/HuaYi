@@ -1,21 +1,19 @@
 import os
 import shutil
 import zipfile
-
-
 import win32com.client as win32
 
+#TODO:界面选择，文件还是文件夹
+
+# 更改 xls 文件为 xlsx文件
 fname = "C:\\Users\\ZhaoKangming\\OneDrive - cnu.edu.cn\\桌面\\img.xls"
 excel = win32.gencache.EnsureDispatch('Excel.Application')
 wb = excel.Workbooks.Open(fname)
-
-wb.SaveAs(fname+"x", FileFormat=51)  # FileFormat = 51 is for .xlsx extension
-wb.Close()  # FileFormat = 56 is for .xls extension
+wb.SaveAs(fname + "x", FileFormat=51)  # FileFormat=51 为 .xlsx, FileFormat=56 为 .xls
+wb.Close()
 excel.Application.Quit()
 
 # 判断是否是文件和判断文件是否存在
-
-
 def isfile_exist(file_path):
     if not os.path.isfile(file_path):
         print("It's not a file or no such file exist ! %s" % file_path)

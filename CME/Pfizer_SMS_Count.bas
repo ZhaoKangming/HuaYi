@@ -61,8 +61,10 @@ Sub Pfizer_SMS_Count()
     Application.DisplayAlerts = False
     With LearnRecord_Wkb.Sheets(2)
         For i = .[A1048576].End(xlUp).Row To 1 Step -1
-            If .Cells(i, 11) & .Cells(i, 13) <> "冠心病相关疾病的规范化治疗医生" And .Cells(i, 11) & .Cells(i, 13) <> "高血压患者相关疾病管理医生" Then 
+            If .Cells(i,11) & .Cells(i,13) <> "冠心病相关疾病的规范化治疗医生" And .Cells(i, 11) & .Cells(i, 13) <> "高血压患者相关疾病管理医生" Then 
                 Rows(i).EntireRow.Delete
+            Else
+                .Cells(i,17) = .Cells(i,2) & .Cells(i,12)
             End If
         Next
     End With
@@ -74,17 +76,15 @@ Sub Pfizer_SMS_Count()
         For i = 4 To Sum_RowNumb - 1
             .Cells(i,8) = Application.WorksheetFunction.Countif(LearnRecord_Wkb.Sheets(2).[B:B],.Cells(i,2))
             .Cells(i,9) = .Cells(i,8)/.Cells(i,3)
-
-            
-            .Cells(i,10) = Application.WorksheetFunction.Countif(ClickRecord_Wkb.Sheets(1).[E:E],.Cells(i,2)&"医生")
-            .Cells(i,11) = .Cells(i,6)/.Cells(i,3)
-            .Cells(i,12) = .Cells(i,6)/.Cells(i,3)
+            .Cells(i,10) = Application.WorksheetFunction.Countif(LearnRecord_Wkb.Sheets(2).[Q:Q],.Cells(i,2)&"学习中")
+            .Cells(i,11) = Application.WorksheetFunction.Countif(LearnRecord_Wkb.Sheets(2).[Q:Q],.Cells(i,2)&"学习完毕")
+            .Cells(i,12) = Application.WorksheetFunction.Countif(LearnRecord_Wkb.Sheets(2).[Q:Q],.Cells(i,2)&"已申请")
         Next
-        .Cells(Sum_RowNumb,8) = Application.WorksheetFunction.Sum(.Range(.[C4],.Cells(Sum_RowNumb-1,3)))
-        .Cells(Sum_RowNumb,9) = Application.WorksheetFunction.Sum(.Range(.[D4],.Cells(Sum_RowNumb-1,4)))
-        .Cells(Sum_RowNumb,10) = .Cells(Sum_RowNumb,4)/.Cells(Sum_RowNumb,3)
-        .Cells(Sum_RowNumb,11) = Application.WorksheetFunction.Sum(.Range(.[F4],.Cells(Sum_RowNumb-1,6)))
-        .Cells(Sum_RowNumb,12) = .Cells(Sum_RowNumb,6)/.Cells(Sum_RowNumb,3)
+        .Cells(Sum_RowNumb,8) = Application.WorksheetFunction.Sum(.Range(.[H4],.Cells(Sum_RowNumb-1,8)))
+        .Cells(Sum_RowNumb,9) = .Cells(Sum_RowNumb,8)/.Cells(Sum_RowNumb,3)
+        .Cells(Sum_RowNumb,10) = Application.WorksheetFunction.Sum(.Range(.[J4],.Cells(Sum_RowNumb-1,10)))
+        .Cells(Sum_RowNumb,11) = Application.WorksheetFunction.Sum(.Range(.[K4],.Cells(Sum_RowNumb-1,11)))
+        .Cells(Sum_RowNumb,12) = Application.WorksheetFunction.Sum(.Range(.[L4],.Cells(Sum_RowNumb-1,12)))
     End With
 
     '------------------- 保存表格并释放变量 -------------------
