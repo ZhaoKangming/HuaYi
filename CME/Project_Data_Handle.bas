@@ -42,8 +42,9 @@ Sub Project_Data_Handle()
 'TODO:检查是否有空值
     Dim TempOther%
     Sheets("专业分析").Activate
-    Call Beautify_Sheet
+    Call BeautifySht
     With Range([D1],Cells([E1048576].End(xlUp).Row,4))
+        .Replace " ",""
         .Replace "NULL","其他"
         .Replace "-请选择-","其他"
         .Replace "无职称","其他"
@@ -66,8 +67,9 @@ Sub Project_Data_Handle()
 'TODO:按照职称级别进行排序
 'TODO:检查是否有空值
     Sheets("职称分析").Activate
-    Call Beautify_Sheet
+    Call BeautifySht
     With Range([D1],Cells([E1048576].End(xlUp).Row,4))
+        .Replace " ",""
         .Replace "NULL","TEMP"
         .Replace "-请选择-","TEMP"
         .Replace "无职称","TEMP"
@@ -90,7 +92,7 @@ Sub Project_Data_Handle()
 'TODO:按照数量多少进行排序
 'TODO:检查是否有空值
     Sheets("省市分布分析").Activate
-    Call Beautify_Sheet
+    Call BeautifySht
     Columns(1).ColumnWidth = 20
     Columns(2).ColumnWidth = 20
     Columns(3).ColumnWidth = 28
@@ -104,7 +106,7 @@ Sub Project_Data_Handle()
 
 '------------------- 【医院等级分析】 -------------------
     Sheets("医院等级分析").Activate
-    Call Beautify_Sheet
+    Call BeautifySht
     With Range([D1],Cells([E1048576].End(xlUp).Row,4))
         .Replace "NULL","其他"
         .Replace "-请选择-","其他"
@@ -131,16 +133,52 @@ Sub Project_Data_Handle()
     'TODO:后续需要手工完成的有以下步骤
 End Sub
 
-Sub Beautify_Sheet()
-    Cells.Select
-    With Selection
+Sub BeautifySht()
+    With ActiveSheet.UsedRange
         .Font.Name = "微软雅黑"
         .Font.Size = 11
         .HorizontalAlignment = xlCenter
         .VerticalAlignment = xlCenter
+        .Borders(xlDiagonalDown).LineStyle = xlNone
+        .Borders(xlDiagonalUp).LineStyle = xlNone
+
+        With .Borders(xlEdgeLeft)
+            .LineStyle = xlContinuous
+            .ColorIndex = 0
+            .TintAndShade = 0
+            .Weight = xlThin
+        End With
+        With .Borders(xlEdgeTop)
+            .LineStyle = xlContinuous
+            .ColorIndex = 0
+            .TintAndShade = 0
+            .Weight = xlThin
+        End With
+        With .Borders(xlEdgeBottom)
+            .LineStyle = xlContinuous
+            .ColorIndex = 0
+            .TintAndShade = 0
+            .Weight = xlThin
+        End With
+        With .Borders(xlEdgeRight)
+            .LineStyle = xlContinuous
+            .ColorIndex = 0
+            .TintAndShade = 0
+            .Weight = xlThin
+        End With
+        With .Borders(xlInsideVertical)
+            .LineStyle = xlContinuous
+            .ColorIndex = 0
+            .TintAndShade = 0
+            .Weight = xlThin
+        End With
+        With .Borders(xlInsideHorizontal)
+            .LineStyle = xlContinuous
+            .ColorIndex = 0
+            .TintAndShade = 0
+            .Weight = xlThin
+        End With
     End With
-    Rows(1).RowHeight = 24
-    Rows(2).RowHeight = 22
 End Sub
 
 Sub Delete_BlankRows()
@@ -151,5 +189,5 @@ Sub Delete_BlankRows()
 End Sub
 
 
-'TODO 有的表格没有美化成功
+'TODO:有的表格没有美化成功
 没有其他的时候不要插入
