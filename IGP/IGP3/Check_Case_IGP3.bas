@@ -35,6 +35,7 @@ Sub Check_Case()
             .MatchAllWordForms = False
         End With
         Selection.Find.Execute Replace:=wdReplaceAll
+    Next
 
 
 '---------------------- 清除特殊格式，统一报告样式 ----------------------
