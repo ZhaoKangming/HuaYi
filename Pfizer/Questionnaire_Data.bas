@@ -4,7 +4,7 @@
 
 Sub Questionnaire_Data_Analyse()
     Application.ScreenUpdating = False
-    Dim LastRow&, i&, DataError as Boolean
+    Dim LastRow&, i&, DataError as Boolean, ICU_Arr
 
     DataError = False
     Sheets("Data").Activate
@@ -32,12 +32,6 @@ Sub Questionnaire_Data_Analyse()
 
     '------------------- 数据清洗 -------------------
 
-    With Range([C2],Cells(LastRow,5))
-        .Replace "","其他"
-        .Replace 
-        For i = 0 TO UBound(ICU_Arr)
-
-    End With
 
 
 
