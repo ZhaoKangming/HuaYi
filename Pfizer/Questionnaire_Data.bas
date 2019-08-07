@@ -10,10 +10,10 @@ Sub Questionnaire_Data_Analyse()
     DataError = False
     Sheets("Data").Activate
     LastRow = Sheets("Data").[A1048576].End(xlUp).Row
-    With Sheets("Data").UsedRange
-        .Replace " ",""
+    ' With Sheets("Data").UsedRange
+    '     .Replace " ",""
     
-    End With
+    ' End With
 
 
     '------------------- 删除没有用的数据 -------------------
