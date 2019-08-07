@@ -215,14 +215,15 @@ Sub Pfizer_Data_Handle()
             .Cells(i,6) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[M:M], .Cells(i, 3))
             .Cells(i,5) = .Cells(i,6) - .Cells(i,7)
         Next
-        
+        .Cells(.[c1048576].End(xlUp).Row,5)= Application.WorksheetFunction.Sum(Range(.[E3],.Cells(.[c1048576].End(xlUp).Row -1 ,5)))
+        .Cells(.[c1048576].End(xlUp).Row,6)= Application.WorksheetFunction.Sum(Range(.[F3],.Cells(.[c1048576].End(xlUp).Row -1 ,6)))
         .[F:F].FormatConditions.Delete
     End With
 
 ' 改text1的font属性，改字号的
 ' time、person_id、Project_id
 
-'TODO:核对统计的正确性
+'TODO:核对统计的正确性:每个表的总数是否一样
 'TODO:发生了减少需要记录检测
 
 ' 另存为xlsx
