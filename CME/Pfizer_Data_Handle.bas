@@ -210,13 +210,14 @@ Sub Pfizer_Data_Handle()
         ' Elseif CityNumb < Last_CityNumb Then
         '     Msgbox "城市减少，统计有错误，请注意！"
         ' End If
+        'TODO:增加城市限制数与进度
 
-        For i = 3 To .[c1048576].End(xlUp).Row
+        For i = 3 To .[b1048576].End(xlUp).Row -1
             .Cells(i,6) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[M:M], .Cells(i, 3))
             .Cells(i,5) = .Cells(i,6) - .Cells(i,7)
         Next
-        .Cells(.[c1048576].End(xlUp).Row,5)= Application.WorksheetFunction.Sum(Range(.[E3],.Cells(.[c1048576].End(xlUp).Row -1 ,5)))
-        .Cells(.[c1048576].End(xlUp).Row,6)= Application.WorksheetFunction.Sum(Range(.[F3],.Cells(.[c1048576].End(xlUp).Row -1 ,6)))
+        .Cells(.[b1048576].End(xlUp).Row,5)= Application.WorksheetFunction.Sum(Range(.[E3],.Cells(.[b1048576].End(xlUp).Row -1 ,5)))
+        .Cells(.[b1048576].End(xlUp).Row,6)= Application.WorksheetFunction.Sum(Range(.[F3],.Cells(.[b1048576].End(xlUp).Row -1 ,6)))
         .[F:F].FormatConditions.Delete
     End With
 
