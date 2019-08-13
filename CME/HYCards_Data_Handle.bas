@@ -2,6 +2,8 @@ Sub Get_CardsNumb()
     Application.ScreenUpdating = False
 
     'TODO:检查市是否有增加？
+    'TODO:省份内/卡类由多到少排序
+    'TODO:加分割双线
     ' 城市数据的统计
     ' 导出的数据有些事文本格式需要转换成数字格式
     ' 表格样式设置，字体，列宽，字号，对齐等，冻结首行
@@ -10,54 +12,40 @@ Sub Get_CardsNumb()
     ' 按销售人员统计，图表，默认是开筛选的
     ' 增长刷超过150的进行提示，Max值
 
-    Dim i%, Card_Wkb As workbook, Click_Wkb As workbook, Tool_Wkb As workbook, RowNumbs%
+
+    80% 预警
+
+    Dim i%, RowNumbs%
+    Dim Prov_Dict As Object, Current_Card_Dict As Dict
     
-    '------------------- 切换工作表 -------------------
-    For i = 1 To Workbooks.Count
-        If Workbooks(i).Name like "*药企*" Then Set Card_Wkb = Workbooks(Workbooks(i).Name) 
-        If Workbooks(i).Name like "*HYCards*" Then Set Tool_Wkb = Workbooks(Workbooks(i).Name)        
+    Workbooks("HYCards-DataTools.xlsm").Activate
+
+    '------------------- 初步处理原始 Data 与表格-------------------
+    Sheets("Data").Activate
+    Rows(1).Delete
+    Columns(1).ClearContents
+    Columns(1).ColumnWidth = 45
+    Columns(3).ColumnWidth = 35
+    With Columns(4)
+        .NumberFormatLocal = "G/通用格式"   '把单元格设置为常规
+        .Value = .Value   '取值
+    End With
+    RowNumbs = Sheets("Data").[B99999].End(xlUp).Row
+    For i = 1 To RowNumbs
+        Cells(i,1) = Cells(i,2) & Cells(i,3)  ' 合并省份及学术卡类型
     Next
 
-    '------------------- 复制工作表并处理 -------------------
-    Sheets("Sheet1").Copy Before:=Sheets("Sheet1")
-    Sheets("Sheet1 (2)").Name = "TEMP"
-    Sheets("TEMP").Activate
-    With Card_Wkb.Sheets("TEMP")
-        .Rows(1).Delete
-        With .Columns(1)
-            .ClearContents
-            .ColumnWidth = 45
-            .FormatConditions.AddUniqueValues
-            .FormatConditions(.FormatConditions.Count).SetFirstPriority
-            .FormatConditions(1).DupeUnique = xlDuplicate
-            With .FormatConditions(1).Font
-                .Color = -16383844
-                .TintAndShade = 0
-            End With
-            With .FormatConditions(1).Interior
-                .PatternColorIndex = xlAutomatic
-                .Color = 13551615
-                .TintAndShade = 0
-            End With
-            .FormatConditions(1).StopIfTrue = False
-        End With
-        .Columns(3).ColumnWidth = 35
-        With Columns(4)
-            .NumberFormatLocal = "G/通用格式"   '把单元格设置为常规
-            .Value = .Value   '取值
-        End With
-        RowNumbs = .[B99999].End(xlUp).Row
-        For i = 1 To RowNumbs
-            .Cells(i,1) = .Cells(i,2) & .Cells(i,3)
-        Next
-    End With
+
+    '------------------- 分析新增的地区及卡类型-------------------
+    
+    For i = 1 To RowNumbs
+        Cells(i,1) = Cells(i,2) & Cells(i,3)  ' 合并省份及学术卡类型
+    Next
+
+    '------------------- 分析新增地区卡类-------------------
 
 
-    '------------------- 分析新增的地区卡项 -------------------
-    Tool_Wkb.Activate
-    With Tool_Wkb.Sheets("省份统计")
-        
-    End With
+    '------------------- 向表格中填充新增的地区卡类-------------------
 
     '------------------- 获取剩余数、进度 -------------------
 
@@ -66,6 +54,7 @@ Sub Get_CardsNumb()
     保留两位小数
 
 
+前三名填充颜色
 
     '------------------- 获取将之前周的统计数据 -------------------
     Usedrange.replace "#N/A","0"
@@ -92,14 +81,7 @@ Sub Get_CardsNumb()
     ' 设置所有框线
 
 
-    Card_Wkb.Save
-    Click_Wkb.Save
-    Learn_Wkb.Save
-    Tool_Wkb.Save
-    Set Card_Wkb = Nothing
-    Set Click_Wkb = Nothing
-    Set Learn_Wkb = Nothing
-    Set Tool_Wkb = Nothing 
+    ActiveWorkbook.Save
     Application.ScreenUpdating = True
     Msgbox "Finished!"
 End Sub
