@@ -11,17 +11,16 @@ Sub Get_CardsNumb()
     ' 省市的增长进度的突然增加预警
     ' 按销售人员统计，图表，默认是开筛选的
     ' 增长刷超过150的进行提示，Max值
+    ' 80% 预警
 
-
-    80% 预警
-
-    Dim i%, RowNumbs%
-    Dim Prov_Dict As Object, Current_Card_Dict As Dict
+    Dim i%, j%, RowNumb%, ColNumb%
+    Dim Prov_Dict As Object, Current_Card_Dict As Object
     
     Workbooks("HYCards-DataTools.xlsm").Activate
 
     '------------------- 初步处理原始 Data 与表格-------------------
     Sheets("Data").Activate
+    Sheets("Data").UsedRange.Replace " ",""
     Rows(1).Delete
     Columns(1).ClearContents
     Columns(1).ColumnWidth = 45
@@ -30,19 +29,59 @@ Sub Get_CardsNumb()
         .NumberFormatLocal = "G/通用格式"   '把单元格设置为常规
         .Value = .Value   '取值
     End With
-    RowNumbs = Sheets("Data").[B99999].End(xlUp).Row
-    For i = 1 To RowNumbs
+    RowNumb = Sheets("Data").[B99999].End(xlUp).Row
+    For i = 1 To RowNumb
         Cells(i,1) = Cells(i,2) & Cells(i,3)  ' 合并省份及学术卡类型
-    Next
+        If Application.WorksheetFunction.countif(Sheets().,Cells(i,5)   'TODO:分析新增地区卡类
+    Next i
 
 
-    '------------------- 分析新增的地区及卡类型-------------------
-    
-    For i = 1 To RowNumbs
-        Cells(i,1) = Cells(i,2) & Cells(i,3)  ' 合并省份及学术卡类型
-    Next
+    '------------------- 省份统计表添加新增的地区卡类型 -------------------
+    Dim ProvCell As Range
+    ' Const NoCardsProv_Numb As Integer = 7  '此数量是
+    For i = 1 To RowNumb
+        ' 获取是否为本周新增
+        If Cells(i,5)="Y" Then 
+            Set ProvCell = Sheets("省份统计").Columns(1).Find(Sheets("Data").Cells(i,2),,,,,xlPrevious)
+            If Not ProvCell Is Nothing Then
+                With Sheets("省份统计")
+                    ColNumb = .Cells(1, Columns.Count).End(xlToLeft).Column
+                    .Rows(ProvCell.Row + 1).Insert
+                    .Cells(ProvCell.Row + 1,1) = Sheets("Data").Cells(i,2)
+                    .Cells(ProvCell.Row + 1,8) = Sheets("Data").Cells(i,3)
+                    .Cells(ProvCell.Row + 1,7) = .Cells(ProvCell.Row + 1,1) & .Cells(ProvCell.Row + 1,8)
+                    For j = 10 To ColNumb
+                        .Cells(ProvCell.Row + 1,j) = 0
+                    Next j
+                End With               
+            Else
+                Sheets("Data").Cells(i,6) = "新增省份"
+            End If
+        End If
+    Next i
 
-    '------------------- 分析新增地区卡类-------------------
+    '------------------- 卡类统计表添加新增的卡类型地区 -------------------
+    Dim CardTypeCell As Range
+    ' Const NoCardsProv_Numb As Integer = 7  '此数量是
+    For i = 1 To RowNumb
+        ' 获取是否为本周新增
+        If Cells(i,5)="Y" Then 
+            Set CardTypeCell = Sheets("卡类统计").Columns(1).Find(Sheets("Data").Cells(i,3),,,,,xlPrevious)
+            If Not CardTypeCell Is Nothing Then
+                With Sheets("卡类统计")
+                    ColNumb = .Cells(1, Columns.Count).End(xlToLeft).Column
+                    .Rows(CardTypeCell.Row + 1).Insert
+                    .Cells(CardTypeCell.Row + 1,1) = Sheets("Data").Cells(i,3)
+                    .Cells(CardTypeCell.Row + 1,7) = Sheets("Data").Cells(i,2)
+                    For j = 9 To ColNumb
+                        .Cells(CardTypeCell.Row + 1,j) = 0
+                    Next j
+                End With               
+            Else
+                Sheets("Data").Cells(i,7) = "新增卡类型"
+            End If
+        End If
+    Next i
 
 
     '------------------- 向表格中填充新增的地区卡类-------------------
@@ -87,3 +126,4 @@ Sub Get_CardsNumb()
 End Sub
 
 
+' 完成后的处理工作
