@@ -1,7 +1,7 @@
 Sub Pfizer_Data_Handle()
     Application.ScreenUpdating = False
 
-    Dim i%, Src_Wkb As Workbook, Dst_Wkb As Workbook
+    Dim i&, RowNumbs&, Src_Wkb As Workbook, Dst_Wkb As Workbook
     Dim Temp_Dict As object
     Dim CellRng As Range, Temp_Rng As Range
 
@@ -168,7 +168,7 @@ Sub Pfizer_Data_Handle()
                     Case Is = 19 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E10:E18])
                     Case Is = 23 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E20:E22])
                     Case Is = 27 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E24:E26])
-                    Case Is = 32 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E28:E31])
+                    Case Is = 33 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E28:E32])
                     Case Else : .Cells(i,5) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[A:A], .Cells(i, 3))
                 End Select
                 .Cells(i,4) = .Cells(i,5) - .Cells(i,6)

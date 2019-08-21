@@ -13,7 +13,7 @@ Sub Get_CardsNumb()
     ' 增长刷超过150的进行提示，Max值
     ' 80% 预警
 
-    Dim i%, j%, RowNumb%, ColNumb%
+    Dim i%, j%, RowNumb%, DstColNumb%, DstRowNumb%, InsertRow%
     Dim Prov_Dict As Object, Current_Card_Dict As Object
     
     Workbooks("HYCards-DataTools.xlsm").Activate
@@ -32,7 +32,7 @@ Sub Get_CardsNumb()
     RowNumb = Sheets("Data").[B99999].End(xlUp).Row
     For i = 1 To RowNumb
         Cells(i,1) = Cells(i,2) & Cells(i,3)  ' 合并省份及学术卡类型
-        If Application.WorksheetFunction.countif(Sheets().,Cells(i,5)   'TODO:分析新增地区卡类
+        If Application.WorksheetFunction.countif(Sheets("省份统计").[G:G],Cells(i,1)) = 0 Then Cells(i,5)= "新增"   'TODO:分析新增地区卡类
     Next i
 
 
@@ -41,22 +41,26 @@ Sub Get_CardsNumb()
     ' Const NoCardsProv_Numb As Integer = 7  '此数量是
     For i = 1 To RowNumb
         ' 获取是否为本周新增
-        If Cells(i,5)="Y" Then 
+        If Cells(i,5)="新增" Then 
             Set ProvCell = Sheets("省份统计").Columns(1).Find(Sheets("Data").Cells(i,2),,,,,xlPrevious)
-            If Not ProvCell Is Nothing Then
-                With Sheets("省份统计")
-                    ColNumb = .Cells(1, Columns.Count).End(xlToLeft).Column
-                    .Rows(ProvCell.Row + 1).Insert
-                    .Cells(ProvCell.Row + 1,1) = Sheets("Data").Cells(i,2)
-                    .Cells(ProvCell.Row + 1,8) = Sheets("Data").Cells(i,3)
-                    .Cells(ProvCell.Row + 1,7) = .Cells(ProvCell.Row + 1,1) & .Cells(ProvCell.Row + 1,8)
-                    For j = 10 To ColNumb
-                        .Cells(ProvCell.Row + 1,j) = 0
-                    Next j
-                End With               
-            Else
+            If ProvCell Is Nothing Then
                 Sheets("Data").Cells(i,6) = "新增省份"
+                DstRowNumb = Sheets("省份统计").[A1048576].End(xlUp).Row
+                InsertRow = DstRowNumb               
+            Else
+                InsertRow = ProvCell.Row + 1
             End If
+
+            With Sheets("省份统计")
+                DstColNumb = .Cells(1, Columns.Count).End(xlToLeft).Column
+                .Rows(InsertRow).Insert
+                .Cells(InsertRow,1) = Sheets("Data").Cells(i,2)
+                .Cells(InsertRow,8) = Sheets("Data").Cells(i,3)
+                .Cells(InsertRow,7) = .Cells(InsertRow,1) & .Cells(InsertRow,8)
+                For j = 10 To DstColNumb
+                    .Cells(InsertRow,j) = 0
+                Next j
+            End With               
         End If
     Next i
 
@@ -65,21 +69,25 @@ Sub Get_CardsNumb()
     ' Const NoCardsProv_Numb As Integer = 7  '此数量是
     For i = 1 To RowNumb
         ' 获取是否为本周新增
-        If Cells(i,5)="Y" Then 
+        If Cells(i,5)="新增" Then 
             Set CardTypeCell = Sheets("卡类统计").Columns(1).Find(Sheets("Data").Cells(i,3),,,,,xlPrevious)
-            If Not CardTypeCell Is Nothing Then
-                With Sheets("卡类统计")
-                    ColNumb = .Cells(1, Columns.Count).End(xlToLeft).Column
-                    .Rows(CardTypeCell.Row + 1).Insert
-                    .Cells(CardTypeCell.Row + 1,1) = Sheets("Data").Cells(i,3)
-                    .Cells(CardTypeCell.Row + 1,7) = Sheets("Data").Cells(i,2)
-                    For j = 9 To ColNumb
-                        .Cells(CardTypeCell.Row + 1,j) = 0
-                    Next j
-                End With               
-            Else
+            If CardTypeCell Is Nothing Then
                 Sheets("Data").Cells(i,7) = "新增卡类型"
+                DstRowNumb = Sheets("卡类统计").[A1048576].End(xlUp).Row
+                InsertRow = DstRowNumb               
+            Else
+                InsertRow = CardTypeCell.Row + 1
             End If
+
+            With Sheets("卡类统计")
+                DstColNumb = .Cells(1, Columns.Count).End(xlToLeft).Column
+                .Rows(InsertRow).Insert
+                .Cells(InsertRow,1) = Sheets("Data").Cells(i,3)
+                .Cells(InsertRow,7) = Sheets("Data").Cells(i,2)
+                For j = 9 To DstColNumb
+                    .Cells(InsertRow,j) = 0
+                Next j
+            End With               
         End If
     Next i
 
