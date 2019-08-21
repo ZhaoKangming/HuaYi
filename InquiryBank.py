@@ -54,5 +54,5 @@ def get_bank(cardNo):
         return bank
 
 
-print(get_bank("6222020200061417248"))
-
+CardNumb = 6222081402001382260
+print(get_bank(CardNumb))
