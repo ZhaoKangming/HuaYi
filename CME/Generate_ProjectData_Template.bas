@@ -77,6 +77,7 @@ Sub Generate_ProjectData_Template()
     End if
 
     '--------------------- 选定相应单元格，使技术粘贴目标数据至此 ---------------------
+    'TODO:不激活无法进行选定，此处需要进行代码重构
     Sheets("总表").[A1].Select
     Sheets("学习人数汇总").[B3].Select
     Sheets("学习基本情况").[B3].Select
