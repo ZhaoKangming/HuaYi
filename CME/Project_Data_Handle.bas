@@ -42,7 +42,7 @@ Sub Project_Data_Handle()
 'TODO:检查是否有空值
     Dim TempOther%
     Sheets("专业分析").Activate
-    Call BeautifySht
+    ' Call BeautifySht
     With Range([D1],Cells([E1048576].End(xlUp).Row,4))
         .Replace " ",""
         .Replace "NULL","其他"
@@ -67,7 +67,7 @@ Sub Project_Data_Handle()
 'TODO:按照职称级别进行排序
 'TODO:检查是否有空值
     Sheets("职称分析").Activate
-    Call BeautifySht
+    ' Call BeautifySht
     With Range([D1],Cells([E1048576].End(xlUp).Row,4))
         .Replace " ",""
         .Replace "NULL","TEMP"
@@ -92,7 +92,7 @@ Sub Project_Data_Handle()
 'TODO:按照数量多少进行排序
 'TODO:检查是否有空值
     Sheets("省市分布分析").Activate
-    Call BeautifySht
+    ' Call BeautifySht
     Columns(1).ColumnWidth = 20
     Columns(2).ColumnWidth = 20
     Columns(3).ColumnWidth = 28
@@ -106,7 +106,7 @@ Sub Project_Data_Handle()
 
 '------------------- 【医院等级分析】 -------------------
     Sheets("医院等级分析").Activate
-    Call BeautifySht
+    ' Call BeautifySht
     With Range([D1],Cells([E1048576].End(xlUp).Row,4))
         .Replace "NULL","其他"
         .Replace "-请选择-","其他"
@@ -134,7 +134,7 @@ Sub Project_Data_Handle()
 End Sub
 
 Sub BeautifySht()
-    With ActiveSheet.UsedRange
+    With ActiveSheet.Selection
         .Font.Name = "微软雅黑"
         .Font.Size = 11
         .HorizontalAlignment = xlCenter
