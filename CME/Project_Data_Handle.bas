@@ -102,7 +102,7 @@ Sub Project_Data_Handle()
     Call Delete_BlankRows
     Cells([A1048576].End(xlUp).Row,3) = Application.WorksheetFunction.Sum(Range([C3],Cells([A1048576].End(xlUp).Row-1,3)))
     If Cells([A1048576].End(xlUp).Row,3) <> SumNumb Then Msgbox "表格 " & ActiveSheet.Name & " 总计数据存在差异！"
-
+'TODO:进行职称的数据统计
 
 '------------------- 【医院等级分析】 -------------------
     Sheets("医院等级分析").Activate
@@ -190,4 +190,5 @@ End Sub
 
 
 'TODO:有的表格没有美化成功
-没有其他的时候不要插入
+' 没有其他的时候不要插入
+如果只有学习基本情况的表格和其他的不同，那么不报错，直接更改学习基本情况的表格数据，同时需要保证已获取学分的数量是小于已经申请的
