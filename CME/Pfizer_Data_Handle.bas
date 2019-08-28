@@ -156,9 +156,9 @@ Sub Pfizer_Data_Handle()
         .Columns(5).EntireColumn.Insert
         .[E2].Value = Format(Now,"yy/mm/dd")
         PvcNumb = .[c1048576].End(xlUp).Row - 7
-        If PvcNumb > Last_PvcNumb Then
+        If PvcNumb < Last_PvcNumb Then
             Msgbox "本周有新增的省份！"
-        Elseif PvcNumb < Last_PvcNumb Then
+        Elseif PvcNumb > Last_PvcNumb Then
             Msgbox "省份减少，统计有错误，请注意！"
         Elseif PvcNumb = Last_PvcNumb Then
             For i = 3 To .[c1048576].End(xlUp).Row
@@ -167,8 +167,8 @@ Sub Pfizer_Data_Handle()
                     Case Is = 9 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E3:E88])
                     Case Is = 19 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E10:E18])
                     Case Is = 23 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E20:E22])
-                    Case Is = 27 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E24:E26])
-                    Case Is = 33 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E28:E32])
+                    Case Is = 28 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E24:E27])
+                    Case Is = 34 : .Cells(i,5) = Application.WorksheetFunction.Sum(.[E29:E33])
                     Case Else : .Cells(i,5) = Application.WorksheetFunction.CountIf(Src_Wkb.Sheets("DocData").[A:A], .Cells(i, 3))
                 End Select
                 .Cells(i,4) = .Cells(i,5) - .Cells(i,6)
