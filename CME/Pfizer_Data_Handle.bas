@@ -60,7 +60,7 @@ Sub Pfizer_Data_Handle()
 
     '---------------- 一些数据统计 --------------
     Sheets("DocData").Activate
-    Dim ZR_Numb%, FZR_Numb%, ZZ_Numb%, YS_Numb%
+    Dim ZR_Numb&, FZR_Numb&, ZZ_Numb&, YS_Numb&
     ' 医生职称的统计
     For i = 1 To RowNumbs
         If Cells(i, 6) Like "*副*" Then
