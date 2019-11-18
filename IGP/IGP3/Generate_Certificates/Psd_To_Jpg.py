@@ -1,8 +1,8 @@
 from psd_tools import PSDImage
 import os
 
-srcFolder = "H:\\赋能起航志愿者证书\\August\\PSD\\"
-dstFolder = "H:\\赋能起航志愿者证书\\August\\JPG\\"
+srcFolder = "H:\\赋能起航志愿者证书\\November\\PSD\\"
+dstFolder = "H:\\赋能起航志愿者证书\\November\\JPG\\"
 
 for file in os.listdir(srcFolder):
 	srcFile = os.path.join(srcFolder, file)
