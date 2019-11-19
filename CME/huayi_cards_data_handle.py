@@ -18,7 +18,7 @@ from openpyxl.styles import Font, Border, Side, Alignment
 import sys
 import time
 
-# TODO:爬虫下载数据记录
+
 def download_data_xls() -> list:
     '''
     【功能】从数据统计后台中下载相应的华医学术卡数据原始记录表
