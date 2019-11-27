@@ -100,7 +100,7 @@ def statistic_data(xlsx_path: str):
     '''
     # ------------------- 获取模板与数据文件 -------------------
     # 载入表格
-    template_xlsx_path: str = os.path.join(workspace_path, '华医学术卡数据周报.xlsx')
+    template_xlsx_path: str = os.path.join(workspace_path, '华医网学术卡数据周报.xlsx')
     data_wb = load_workbook(xlsx_path)
     template_wb = load_workbook(template_xlsx_path)
 
@@ -115,11 +115,14 @@ def statistic_data(xlsx_path: str):
     for spare_col_numb in spare_cols_list:
         data_sht.delete_cols(spare_col_numb)
 
-    # 插入新列
-    data_sht.insert_rows(3)
+    # 插入新列并获取绑卡的月份，小时
+    data_sht.insert_columns(3, 2)
+    for i in range(2, last_row + 1):
+        data_sht.cell(i, 3).value = str(data_sht.cell(i, 2).value)[5:7]  # 月份
+        data_sht.cell(i, 4).value = str(data_sht.cell(i, 2).value)[11:13] # 小时
 
     # 设置列名
-    col_name_list: list = ['卡类型','绑定时间','小时','省份','城市','单位级别','职称','专业']
+    col_name_list: list = ['卡类型','绑定时间','月份','小时','省份','城市','单位级别','职称','专业']
     for i in range(len(col_name_list)):
         data_sht.cell(1,i+1).value = col_name_list[i]
 
@@ -140,6 +143,11 @@ def statistic_data(xlsx_path: str):
                         data_sht.cell(i, int(v)).value = '其他'
                     if k == '城市' and data_sht.cell(i, int(v)).value in city_outlier_list:
                         data_sht.cell(i, int(v)).value += data_sht.cell(i, int(content_col_dict['省份'])).value
+
+    # 开始数据统计
+    card_numb_dict: dict = []
+
+    for i in range(2, last_row + 1):
 
 
     # 《省份分布表》数据写入
