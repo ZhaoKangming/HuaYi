@@ -21,15 +21,24 @@ import re
 
 
 ''' 
-提前的准备工作
+------------------- 提前的准备工作 -----------------------
+
 1. 三个表复制数据列并清空数据，按照相同格式增加日期标注
 2. 在《企业投放统计》表格中新增卡类型
 3. 
+
+------------------- 之后的收尾工作 -----------------------
+
+1.因用openpyxl会使得表格的样式变化，请将表格单独复制，并用Chart_Data进行数据替换
+2.更新一页图表中的周报完成日期与时间的更新
+
+
 '''
 
 # 全局变量的定义及赋值
 workspace_path: str = os.path.dirname(os.path.realpath(__file__))
 today_date: str = str(datetime.date.today()).replace("-", "").replace('2019','19')
+step_numb: int = 0
 
 
 def download_data_xls() -> list:
@@ -98,21 +107,24 @@ def statistic_data():
     '''
     【功能】进行华医学术卡数据统计分析
     '''
-
-
     # ------------------- 获取模板与数据文件并备份 -------------------
     # 载入表格
     data_xlsx_path: str = os.path.join(workspace_path, 'data', f'华医学术卡原始数据-{today_date}.xlsx')
     data_wb = load_workbook(data_xlsx_path)
     template_xlsx_path: str = os.path.join(workspace_path, '华医网学术卡数据周报.xlsx')
     template_wb = load_workbook(template_xlsx_path)
+    chart_data_sht = template_wb['Chart_Data']
+    cpy_sht = template_wb['企业投放统计']
 
     # 备份并重命名《学习记录》原始数据表
     data_sht = data_wb.copy_worksheet(data_wb['sheet0'])
     data_wb['sheet0'].title = 'backup'
     data_sht.title = 'data'
     data_last_row: int = data_sht.max_row
-    sum_numb: int = data_last_row - 1       # 总绑卡数
+    sum_card_numb_now: int = data_last_row - 1       # 当前全国总绑卡数
+
+    step_numb += 1
+    print(f'【STEP-{step_numb}】表格载入与数据备份\n\t\t[OK] --> 已经成功备份数据表格!\n')
 
     # ------------------- 数据清洗 -------------------
     # 删除多余的列
@@ -151,6 +163,9 @@ def statistic_data():
                     if k == '省份' and data_sht.cell(i, int(v)).value == '黑龙江森林工业总局卫生局':
                         data_sht.cell(i, int(v)).value = '黑龙江森工'
 
+    step_numb += 1
+    print(f'【STEP-{step_numb}】数据清洗\n\t\t[OK] --> 已经完成数据清洗!\n')
+
     # ------------------- 数据统计 -------------------
     pro_card_dict: dict = {}
     pro_card: str = ''
@@ -185,12 +200,32 @@ def statistic_data():
         month_dict[data_sht.cell(i, 3).value] += 1      # 月份统计
         hosp_dict[data_sht.cell(i, 7).value] += 1      # 医院级别统计
 
+    step_numb += 1
+    print(f'【STEP-{step_numb}】数据统计\n\t\t[OK] --> 已经完成数据统计!\n')
+
+    # ------------------- 其他信息的读取 -------------------
+    #.......... 省份限制类信息的读取 ............
+    prov_limit_dict: dict = {}      # 省份的限制信息字典
+    for i in range(2, template_wb['Prov_Limit'].max_row + 1):
+        prov_limit_dict[template_wb['Prov_Limit'].cell(i,1).value] = [template_wb['Prov_Limit'].cell(i,2).value, template_wb['Prov_Limit'].cell(i,3).value]
+    
+    #.......... 企业投放类信息的读取 ............
+    cpy_lastrow: int = cpy_sht.max_row  # 企业投放统计表的最后一行行号
+    sold_card_numb: int = 0             # 已经售出的卡数量总和
+    for i in range(2, cpy_lastrow):
+        sold_card_numb += cpy_sht.cell(i,7).value
+
+    #.......... 其他类信息的读取 ............
+    delta = datetime.datetime.now() - datetime.datetime.strptime('2019-02-01', '%Y-%m-%d')
+    avg_week_card: int = int(sum_card_numb_now/int(delta.days))*7
+
+
+    step_numb += 1
+    print(f'【STEP-{step_numb}】其他数据读取\n\t\t[OK] --> 已经完成相关辅助数据的读取!\n')
+
 
     # ------------------- 数据写入 -------------------
-
-    # 《Chart_Data》数据写入
-
-    # 《省份分布表》数据写入
+    # ............《省份分布表》............
     pro_last_row: int = template_wb['省份分布'].max_row
     # ----- 写入备注
     notes_dict: dict = {}
@@ -201,14 +236,32 @@ def statistic_data():
     # 《卡类状况表》数据写入
 
     # 《企业投放统计表》数据写入
-    cpy_lastrow: int = template_wb['企业投放统计']
+    
 
+    # ............《Chart_Data》............
+    # 【0】绑卡进度
+    # 全国绑卡数
+    chart_data_sht['C2'].value = sum_card_numb_now
+    chart_data_sht['C3'].value = prov_limit_dict['总计'][1] - sum_card_numb_now                 # 全国剩余量
+    for i in [4, 6, 8]:
+        chart_data_sht.cell(i, 3).value = pro_dict[chart_data_sht.cell(i, 1).value]             # 三省的绑卡数
+    for i in [5, 7, 9]:
+        prov_limit_dict[chart_data_sht.cell(i, 1).value][1] - chart_data_sht.cell(i, 3).value   # 三省的剩余量
+
+    # 【0】卡数量大字标
+    chart_data_sht['F2'].value = sold_card_numb         # 累计售卡数
+    chart_data_sht['F3'].value = sum_card_numb_now      # 累计绑卡数
+    chart_data_sht['F4'].value = 0                      # TODO:本周新绑卡数
+    chart_data_sht['F5'].value = avg_week_card          # 平均周绑卡数
+
+    chart_data_sht['I2'].value = f'学术卡数据周报 — {today_date}'    # 标题日期更新
 
 
     # 表格的保存
     data_wb.save(data_xlsx_path)
     report_wb_path: str = os.path.join(workspace_path, 'history', f'华医网学术卡数据周报-{today_date}.xlsx')
     template_wb.save(report_wb_path)
+
 
     print("【STEP-10】数据写入文件保存\n\t\t [OK] --> 已经将数据写入到表格中！\n")
 
@@ -217,12 +270,16 @@ def statistic_data():
 def huayi_card_report():
     data_result: list = download_data_xls()
     if data_result[0] == 200:
-        print(f'【STEP-1】爬虫下载原始数据\n\t\t[OK] --> 已经成功下载数据文件!\n')
+        step_numb += 1
+        print(f'【STEP-{step_numb}】爬虫下载原始数据\n\t\t[OK] --> 已经成功下载数据文件!\n')
         xlsx_path: str = xls_to_xlsx(data_result[1])
-        print(f'【STEP-2】文件格式转换\n\t\t[OK] --> 已经将文件转化为xlsx格式!\n')
-
+        step_numb += 1
+        print(f'【STEP-{step_numb}】文件格式转换\n\t\t[OK] --> 已经将文件转化为xlsx格式!\n')
+        statistic_data()
+        print('-'*100 + '\n统计完成，请自行检查核对一下数据及样式是否正确！！！\n')
     else:
-        print(f'【STEP-1】爬虫下载原始数据\n\t\t[ERROR] --> 未能从服务器中成功爬取数据:状态码为 {data_result[0]}\n')
+        step_numb += 1
+        print(f'【STEP-{step_numb}】爬虫下载原始数据\n\t\t[ERROR] --> 未能从服务器中成功爬取数据:状态码为 {data_result[0]}\n')
 
 
 huayi_card_report()
