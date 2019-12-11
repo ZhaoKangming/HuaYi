@@ -111,7 +111,7 @@ def statistic_data():
     # 载入表格
     data_xlsx_path: str = os.path.join(workspace_path, 'data', f'华医学术卡原始数据-{today_date}.xlsx')
     data_wb = load_workbook(data_xlsx_path)
-    template_xlsx_path: str = os.path.join(workspace_path, '华医网学术卡数据周报.xlsx')
+    template_xlsx_path: str = os.path.join(workspace_path, '【数据模板】华医网学术卡数据周报.xlsx')
     template_wb = load_workbook(template_xlsx_path)
     chart_data_sht = template_wb['Chart_Data']
     cpy_sht = template_wb['企业投放统计']
@@ -248,7 +248,7 @@ def statistic_data():
     for i in [5, 7, 9]:
         prov_limit_dict[chart_data_sht.cell(i, 1).value][1] - chart_data_sht.cell(i, 3).value   # 三省的剩余量
 
-    # 【0】卡数量大字标
+    #【0】卡数量大字标
     chart_data_sht['F2'].value = sold_card_numb         # 累计售卡数
     chart_data_sht['F3'].value = sum_card_numb_now      # 累计绑卡数
     chart_data_sht['F4'].value = 0                      # TODO:本周新绑卡数
@@ -256,6 +256,30 @@ def statistic_data():
 
     chart_data_sht['I2'].value = f'学术卡数据周报 — {today_date}'    # 标题日期更新
 
+    #【1】全国绑卡数趋势图
+    for i in range(13,24):
+        chart_data_sht.cell(i,3).value = month_dict[chart_data_sht.cell(i,1).value]
+
+    #【2】TOP5 省份周增长绑卡数
+    #TODO:
+
+    #【3】TOP5 卡类型周增长绑卡数箱型图
+    #TODO:
+
+    #【4】TOP10 省份绑卡数量分布图
+    #TODO:
+
+    #【5】省份绑卡状况数据地图
+    for i in range(28,62):
+        chart_data_sht.cell(i,7).value = pro_dict[chart_data_sht.cell(i,6).value]
+
+    #【6】企业购卡数量柱状图
+    #TODO:
+
+
+    #【7】TOP10 城市绑卡数量分布图
+    #【8】各小时内绑卡数量趋势图
+    #【9】绑卡医生医院级别比例
 
     # 表格的保存
     data_wb.save(data_xlsx_path)
@@ -263,7 +287,7 @@ def statistic_data():
     template_wb.save(report_wb_path)
 
 
-    print("【STEP-10】数据写入文件保存\n\t\t [OK] --> 已经将数据写入到表格中！\n")
+    print("【STEP-10】数据写入文件保存\n\t\t [OK] --> 已经将数据写入到表格中并完成保存！\n")
 
 
 # ------------------------------ 主体调用部分 ------------------------------
