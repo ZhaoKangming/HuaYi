@@ -281,6 +281,11 @@ def statistic_data():
     #【8】各小时内绑卡数量趋势图
     #【9】绑卡医生医院级别比例
 
+
+    # ------------------- 删除掉多余的数据表格 -------------------
+
+    # ------------------- 合并单元格 -------------------
+
     # 表格的保存
     data_wb.save(data_xlsx_path)
     report_wb_path: str = os.path.join(workspace_path, 'history', f'华医网学术卡数据周报-{today_date}.xlsx')
