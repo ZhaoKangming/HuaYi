@@ -23,7 +23,6 @@ import re
 ''' 
 ------------------- 提前的准备工作 -----------------------
 
-1. 三个表复制数据列并清空数据，按照相同格式增加日期标注
 2. 在《企业投放统计》表格中新增卡类型
 3. 
 
@@ -107,6 +106,7 @@ def statistic_data():
     '''
     【功能】进行华医学术卡数据统计分析
     '''
+    global step_numb
     # ------------------- 获取模板与数据文件并备份 -------------------
     # 载入表格
     data_xlsx_path: str = os.path.join(workspace_path, 'data', f'华医学术卡原始数据-{today_date}.xlsx')
@@ -114,7 +114,10 @@ def statistic_data():
     template_xlsx_path: str = os.path.join(workspace_path, '【数据模板】华医网学术卡数据周报.xlsx')
     template_wb = load_workbook(template_xlsx_path)
     chart_data_sht = template_wb['Chart_Data']
+    prov_sht = template_wb['省份分布']
+    card_sht = template_wb['卡类状况']
     cpy_sht = template_wb['企业投放统计']
+    
 
     # 备份并重命名《学习记录》原始数据表
     data_sht = data_wb.copy_worksheet(data_wb['sheet0'])
@@ -145,7 +148,7 @@ def statistic_data():
 
     # 数据清洗
     content_col_dict: dict = {'省份':'5' , '城市':'6' , '单位级别':'7' , '职称':'8' , '专业':'9'}
-    outlier_list: list = ['', '其它', '-请选择-', 'NULL', 'null']
+    outlier_list: list = ['', '其它', '-请选择-', 'NULL', 'null','请选择']
     city_outlier_list: list = ['省直属单位', '省直辖县级行政单位', '省直辖县级行政区划']
     #TODO:检查dict是否有重复的列值，有问题则报错
     for i in range(2, data_last_row + 1):
@@ -167,30 +170,34 @@ def statistic_data():
     print(f'【STEP-{step_numb}】数据清洗\n\t\t[OK] --> 已经完成数据清洗!\n')
 
     # ------------------- 数据统计 -------------------
-    pro_card_dict: dict = {}
-    pro_card: str = ''
-    pro_dict: dict = {"广东省" : 0, "四川省" : 0, "海南省" : 0, "山西省" : 0, "江苏省" : 0, "山东省" : 0, "北京市" : 0, "江西省" : 0, "重庆市" : 0, "湖南省" : 0, "河南省" : 0, "福建省" : 0, "贵州省" : 0, "黑龙江省" : 0, "安徽省" : 0, "新疆维吾尔自治区" : 0, "吉林省" : 0, "河北省" : 0, "广西壮族自治区" : 0, "辽宁省" : 0, "浙江省" : 0, "陕西省" : 0, "宁夏回族自治区" : 0, "湖北省" : 0, "甘肃省" : 0, "青海省" : 0, "西藏自治区" : 0, "天津市" : 0, "上海市" : 0, "云南省" : 0, "内蒙古自治区" : 0, "香港特别行政区" : 0, "澳门特别行政区" : 0, "台湾省" : 0, "其他" : 0} 
+    prov_card_dict: dict = {}
+    prov_card: str = ''
+    orig_prov_dict: dict = {}   # 对省份不进行合并
+    prov_dict: dict = {"广东省" : 0, "四川省" : 0, "海南省" : 0, "山西省" : 0, "江苏省" : 0, "山东省" : 0, "北京市" : 0, "江西省" : 0, "重庆市" : 0, "湖南省" : 0, "河南省" : 0, "福建省" : 0, "贵州省" : 0, "黑龙江省" : 0, "安徽省" : 0, "新疆维吾尔自治区" : 0, "吉林省" : 0, "河北省" : 0, "广西壮族自治区" : 0, "辽宁省" : 0, "浙江省" : 0, "陕西省" : 0, "宁夏回族自治区" : 0, "湖北省" : 0, "甘肃省" : 0, "青海省" : 0, "西藏自治区" : 0, "天津市" : 0, "上海市" : 0, "云南省" : 0, "内蒙古自治区" : 0, "香港特别行政区" : 0, "澳门特别行政区" : 0, "台湾省" : 0, "其他" : 0} 
     pro: str = ''
     city_dict: dict = {}
     hour_dict: dict = {"00": 0, "01": 0, "02": 0, "03": 0, "04": 0, "05": 0, "06": 0, "07": 0, "08": 0, "09": 0, "10": 0, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0, "17": 0, "18": 0, "19": 0, "20": 0, "21": 0, "22": 0, "23": 0}
     month_dict: dict = {"02" : 0, "03" : 0, "04" : 0, "05" : 0, "06" : 0, "07" : 0, "08" : 0, "09" : 0, "10" : 0, "11" : 0, "12" : 0}
     hosp_dict: dict = {"三甲" : 0, "三乙" : 0, "二甲" : 0, "二乙" : 0, "一甲" : 0, "一乙" : 0, "其他" : 0}
-    
+
 
     for i in range(2, data_last_row + 1):
-        pro_card = data_sht.cell(i, 1).value + '#' + data_sht.cell(i, 5).value
+        prov_card = data_sht.cell(i, 5).value + '#' + data_sht.cell(i, 1).value
         # 省份-卡类型字典统计
-        pro_card_dict.setdefault(pro_card, 0)
-        pro_card_dict[pro_card] += 1
+        prov_card_dict.setdefault(prov_card, 0)
+        prov_card_dict[prov_card] += 1
+
+        orig_prov_dict.setdefault(data_sht.cell(i, 5).value, 0)
+        orig_prov_dict[data_sht.cell(i, 5).value] += 1
 
         # 省份统计
         if '新疆' in data_sht.cell(i, 5).value:
-            pro = '新疆维吾尔族自治区'           # 发卡区域合并：新疆生产建设兵团
+            pro = '新疆维吾尔自治区'           # 发卡区域合并：新疆生产建设兵团
         elif '黑龙江' in data_sht.cell(i, 5).value:
             pro = '黑龙江省'                    # 发卡区域合并：黑龙江森林工业总局卫生局、黑龙江农垦、黑龙江森工
         else:
             pro = data_sht.cell(i, 5).value
-        pro_dict[pro] += 1
+        prov_dict[pro] += 1
 
         # 城市统计
         city_dict.setdefault(data_sht.cell(i, 6).value, 0)
@@ -210,15 +217,15 @@ def statistic_data():
         prov_limit_dict[template_wb['Prov_Limit'].cell(i,1).value] = [template_wb['Prov_Limit'].cell(i,2).value, template_wb['Prov_Limit'].cell(i,3).value]
     
     #.......... 企业投放类信息的读取 ............
-    cpy_lastrow: int = cpy_sht.max_row  # 企业投放统计表的最后一行行号
+    cpy_last_row: int = cpy_sht.max_row  # 企业投放统计表的最后一行行号
     sold_card_numb: int = 0             # 已经售出的卡数量总和
-    for i in range(2, cpy_lastrow):
+    card_info_dict: dict = {}           # 记录卡类型的所属企业和购卡数量信息                   
+    for i in range(2, cpy_last_row):
         sold_card_numb += cpy_sht.cell(i,7).value
-
+        card_info_dict[cpy_sht.cell(i, 5).value] = [cpy_sht.cell(i, 1).value, cpy_sht.cell(i,7).value]
     #.......... 其他类信息的读取 ............
-    delta = datetime.datetime.now() - datetime.datetime.strptime('2019-02-01', '%Y-%m-%d')
-    avg_week_card: int = int(sum_card_numb_now/int(delta.days))*7
-
+    delta = datetime.datetime.now() - datetime.datetime.strptime('2019-02-01', '%Y-%m-%d')  # 今天与190201相距多少天
+    avg_week_card: int = int(sum_card_numb_now/int(delta.days))*7  # 平均周绑卡数量
 
     step_numb += 1
     print(f'【STEP-{step_numb}】其他数据读取\n\t\t[OK] --> 已经完成相关辅助数据的读取!\n')
@@ -226,17 +233,96 @@ def statistic_data():
 
     # ------------------- 数据写入 -------------------
     # ............《省份分布表》............
-    pro_last_row: int = template_wb['省份分布'].max_row
-    # ----- 写入备注
-    notes_dict: dict = {}
-    for i in range(2, pro_last_row):
-        if template_wb['省份分布'].cell(i, 1).value in notes_dict.keys():
-            template_wb['省份分布'].cell(i, 2).value = notes_dict[template_wb['省份分布'].cell(i, 1).value]
+    prov_sht.insert_cols(9)
+    prov_sht['I1'].value = today_date
+    prov_last_col: int = prov_sht.max_column
+    # 插入新的省份与卡类型
+    for k,v in prov_card_dict.items():
+        prov_last_row: int = prov_sht.max_row
+        is_new_item: bool = True
+        is_new_prov: bool = True
+        # 处理已经存在的省份-卡类型
+        for i in range(2, prov_last_row):
+            current_prov_card: str = prov_sht.cell(i,1).value + '#' + prov_sht.cell(i,7).value
+            if current_prov_card == k:
+                prov_sht.cell(i,9).value = v
+                is_new_item = False
+                is_new_prov = False
+                break
+        # 处理新增的省份-卡类型
+        if is_new_item == True:
+            for i in range(2, prov_last_row):
+                if prov_sht.cell(i, 1).value == k.split('#')[0]:
+                    is_new_prov = False
+                    # 处理当前投放机构首次出现绑卡的状况
+                    if  prov_sht.cell(i, 7).value == '—':
+                        prov_sht.cell(i, 7).value = k.split('#')[1]
+                        prov_sht.cell(i, 9).value = v
+                    # 处理当前投放机构之前有绑卡，本次新增卡类型的状况
+                    else:
+                        prov_sht.insert_rows(i)
+                        prov_sht.cell(i, 1).value = k.split('#')[0]
+                        prov_sht.cell(i, 7).value = k.split('#')[1]
+                        prov_sht.cell(i, 9).value = v
+                    for j in range(10, prov_last_col + 1):
+                        prov_sht.cell(i, j).value = 0
+                    break
+        # 处理新增的投放机构
+        if is_new_prov == True:
+            temp_prov = k.split('#')[0]
+            print(f'>>>>>>>> 出现了新的发卡机构【{temp_prov}】，请注意 <<<<<<<<\n')
+            prov_sht.insert_rows(prov_last_row-1)
+            prov_sht.cell(prov_last_row-1, 1).value = k.split('#')[0]
+            prov_sht.cell(prov_last_row-1, 7).value = k.split('#')[1]
+            prov_sht.cell(prov_last_row-1, 9).value = v
+            for j in range(10, prov_last_col + 1):
+                prov_sht.cell(prov_last_row-1, j).value = 0
 
-    # 《卡类状况表》数据写入
+    prov_last_row = prov_sht.max_row
+
+    for i in range(2, prov_last_row):
+        # 将之前有过绑卡记录但是现在为0的以及至今从未发出卡的投放机构用 0来补全
+        if not prov_sht.cell(i, 1).value + '#' + prov_sht.cell(i, 7).value in prov_card_dict.keys():
+            prov_sht.cell(i, 9).value = 0
+
+        if prov_sht.cell(i, 1).value in prov_limit_dict.keys():
+            prov_sht.cell(i, 2).value = prov_limit_dict[prov_sht.cell(i, 1).value][0]         # 写入省份的投放限制备注
+            prov_sht.cell(i, 3).value = prov_limit_dict[prov_sht.cell(i, 1).value][1]         # 写入省份的限制数
+        
+        if prov_sht.cell(i, 1).value in orig_prov_dict.keys():                                # 计算省份已发卡数
+            prov_sht.cell(i, 4).value = orig_prov_dict[prov_sht.cell(i, 1).value]
+        else:
+            prov_sht.cell(i, 4).value = 0
+        if prov_sht.cell(i, 3).value == '—':
+            prov_sht.cell(i, 5).value = 0                                                     # 计算卡的剩余量
+            prov_sht.cell(i, 6).value = '超出！'
+        else:
+            prov_sht.cell(i, 5).value = prov_sht.cell(i, 3).value - prov_sht.cell(i, 4).value     # 计算卡的剩余量
+            prov_sht.cell(i, 6).value = 100*prov_sht.cell(i, 4).value / prov_sht.cell(i, 3).value # 计算投放进度
+        if prov_sht.cell(i, 6).value != '超出！' and prov_sht.cell(i, 6).value > 100:
+            prov_sht.cell(i, 6).value = '超出！'
+        prov_sht.cell(i, 8).value = prov_sht.cell(i, 9).value - prov_sht.cell(i, 10).value    # 计算本周增加数
+
+    # 计算最后一行的总结列
+    prov_sht.cell(prov_last_row, 3).value  = prov_limit_dict['总计']
+    prov_sht.cell(prov_last_row, 4).value = sum_card_numb_now
+    prov_sht.cell(prov_last_row, 5).value = prov_limit_dict['总计'] - sum_card_numb_now
+    prov_sht.cell(prov_last_row, 6).value = 100*prov_sht.cell(prov_last_row, 4).value / prov_sht.cell(prov_last_row, 3).value
+    prov_sht.cell(prov_last_row, 8).value = sum_card_numb_now - prov_sht.cell(prov_last_row, 10).value
+    prov_sht.cell(prov_last_row, 9).value = sum_card_numb_now
+
+
+
+    # ............《卡类状况表》............
+    card_last_row: int = card_sht.max_row
+    card_sht.insert_cols(9)
+    card_sht['I1'].value = today_date
+
+
 
     # 《企业投放统计表》数据写入
-    
+    cpy_sht.insert_cols(10)
+    cpy_sht['J1'].value = today_date
 
     # ............《Chart_Data》............
     # 【0】绑卡进度
@@ -244,15 +330,15 @@ def statistic_data():
     chart_data_sht['C2'].value = sum_card_numb_now
     chart_data_sht['C3'].value = prov_limit_dict['总计'][1] - sum_card_numb_now                 # 全国剩余量
     for i in [4, 6, 8]:
-        chart_data_sht.cell(i, 3).value = pro_dict[chart_data_sht.cell(i, 1).value]             # 三省的绑卡数
+        chart_data_sht.cell(i, 3).value = prov_dict[chart_data_sht.cell(i, 1).value]             # 三省的绑卡数
     for i in [5, 7, 9]:
         prov_limit_dict[chart_data_sht.cell(i, 1).value][1] - chart_data_sht.cell(i, 3).value   # 三省的剩余量
 
     #【0】卡数量大字标
-    chart_data_sht['F2'].value = sold_card_numb         # 累计售卡数
-    chart_data_sht['F3'].value = sum_card_numb_now      # 累计绑卡数
-    chart_data_sht['F4'].value = 0                      # TODO:本周新绑卡数
-    chart_data_sht['F5'].value = avg_week_card          # 平均周绑卡数
+    chart_data_sht['F2'].value = sold_card_numb                             # 累计售卡数
+    chart_data_sht['F3'].value = sum_card_numb_now                          # 累计绑卡数
+    chart_data_sht['F4'].value = prov_sht.cell(prov_last_row, 8).value      # 本周新绑卡数
+    chart_data_sht['F5'].value = avg_week_card                              # 平均周绑卡数
 
     chart_data_sht['I2'].value = f'学术卡数据周报 — {today_date}'    # 标题日期更新
 
@@ -271,7 +357,7 @@ def statistic_data():
 
     #【5】省份绑卡状况数据地图
     for i in range(28,62):
-        chart_data_sht.cell(i,7).value = pro_dict[chart_data_sht.cell(i,6).value]
+        chart_data_sht.cell(i,7).value = prov_dict[chart_data_sht.cell(i,6).value]
 
     #【6】企业购卡数量柱状图
     #TODO:
@@ -286,7 +372,10 @@ def statistic_data():
 
     # ------------------- 合并单元格 -------------------
 
-    # 表格的保存
+    # ------------------- 检查数据是否存在误差 -------------------
+
+
+    # ------------------- 表格的保存 -------------------
     data_wb.save(data_xlsx_path)
     report_wb_path: str = os.path.join(workspace_path, 'history', f'华医网学术卡数据周报-{today_date}.xlsx')
     template_wb.save(report_wb_path)
@@ -298,6 +387,7 @@ def statistic_data():
 # ------------------------------ 主体调用部分 ------------------------------
 def huayi_card_report():
     data_result: list = download_data_xls()
+    global step_numb
     if data_result[0] == 200:
         step_numb += 1
         print(f'【STEP-{step_numb}】爬虫下载原始数据\n\t\t[OK] --> 已经成功下载数据文件!\n')
