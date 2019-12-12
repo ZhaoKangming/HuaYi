@@ -30,6 +30,7 @@ import re
 
 1.因用openpyxl会使得表格的样式变化，请将表格单独复制，并用Chart_Data进行数据替换
 2.更新一页图表中的周报完成日期与时间的更新
+3.使用格式刷来将新插入的行的样式使之一致
 
 
 '''
@@ -175,6 +176,7 @@ def statistic_data():
     orig_prov_dict: dict = {}   # 对省份不进行合并
     prov_dict: dict = {"广东省" : 0, "四川省" : 0, "海南省" : 0, "山西省" : 0, "江苏省" : 0, "山东省" : 0, "北京市" : 0, "江西省" : 0, "重庆市" : 0, "湖南省" : 0, "河南省" : 0, "福建省" : 0, "贵州省" : 0, "黑龙江省" : 0, "安徽省" : 0, "新疆维吾尔自治区" : 0, "吉林省" : 0, "河北省" : 0, "广西壮族自治区" : 0, "辽宁省" : 0, "浙江省" : 0, "陕西省" : 0, "宁夏回族自治区" : 0, "湖北省" : 0, "甘肃省" : 0, "青海省" : 0, "西藏自治区" : 0, "天津市" : 0, "上海市" : 0, "云南省" : 0, "内蒙古自治区" : 0, "香港特别行政区" : 0, "澳门特别行政区" : 0, "台湾省" : 0, "其他" : 0} 
     pro: str = ''
+    card_dict: dict = {}
     city_dict: dict = {}
     hour_dict: dict = {"00": 0, "01": 0, "02": 0, "03": 0, "04": 0, "05": 0, "06": 0, "07": 0, "08": 0, "09": 0, "10": 0, "11": 0, "12": 0, "13": 0, "14": 0, "15": 0, "16": 0, "17": 0, "18": 0, "19": 0, "20": 0, "21": 0, "22": 0, "23": 0}
     month_dict: dict = {"02" : 0, "03" : 0, "04" : 0, "05" : 0, "06" : 0, "07" : 0, "08" : 0, "09" : 0, "10" : 0, "11" : 0, "12" : 0}
@@ -203,6 +205,10 @@ def statistic_data():
         city_dict.setdefault(data_sht.cell(i, 6).value, 0)
         city_dict[data_sht.cell(i, 6).value] += 1
 
+        # 卡类型统计
+        card_dict.setdefault(data_sht.cell(i, 1).value, 0)
+        card_dict[data_sht.cell(i, 1).value] += 1
+
         hour_dict[data_sht.cell(i, 4).value] += 1      # 小时统计        
         month_dict[data_sht.cell(i, 3).value] += 1      # 月份统计
         hosp_dict[data_sht.cell(i, 7).value] += 1      # 医院级别统计
@@ -223,6 +229,7 @@ def statistic_data():
     for i in range(2, cpy_last_row):
         sold_card_numb += cpy_sht.cell(i,7).value
         card_info_dict[cpy_sht.cell(i, 5).value] = [cpy_sht.cell(i, 1).value, cpy_sht.cell(i,7).value]
+
     #.......... 其他类信息的读取 ............
     delta = datetime.datetime.now() - datetime.datetime.strptime('2019-02-01', '%Y-%m-%d')  # 今天与190201相距多少天
     avg_week_card: int = int(sum_card_numb_now/int(delta.days))*7  # 平均周绑卡数量
@@ -304,35 +311,134 @@ def statistic_data():
         prov_sht.cell(i, 8).value = prov_sht.cell(i, 9).value - prov_sht.cell(i, 10).value    # 计算本周增加数
 
     # 计算最后一行的总结列
-    prov_sht.cell(prov_last_row, 3).value  = prov_limit_dict['总计']
+    prov_sht.cell(prov_last_row, 3).value  = prov_limit_dict['总计'][1]
     prov_sht.cell(prov_last_row, 4).value = sum_card_numb_now
-    prov_sht.cell(prov_last_row, 5).value = prov_limit_dict['总计'] - sum_card_numb_now
-    prov_sht.cell(prov_last_row, 6).value = 100*prov_sht.cell(prov_last_row, 4).value / prov_sht.cell(prov_last_row, 3).value
+    prov_sht.cell(prov_last_row, 5).value = prov_limit_dict['总计'][1] - sum_card_numb_now
+    prov_sht.cell(prov_last_row, 6).value = prov_sht.cell(prov_last_row, 4).value / prov_sht.cell(prov_last_row, 3).value
     prov_sht.cell(prov_last_row, 8).value = sum_card_numb_now - prov_sht.cell(prov_last_row, 10).value
     prov_sht.cell(prov_last_row, 9).value = sum_card_numb_now
 
 
 
     # ............《卡类状况表》............
-    card_last_row: int = card_sht.max_row
     card_sht.insert_cols(9)
     card_sht['I1'].value = today_date
+    card_last_col: int = card_sht.max_col
+    card_last_row: int = card_sht.max_row
 
+    for k, v in prov_card_dict.items():
+        card_last_row: int = card_sht.max_row
+        is_new_item: bool = True
+        is_new_cardtype: bool = True
+        # 处理已经存在的 卡类型-省份
+        for i in range(2, card_last_row):
+            current_prov_card: str = card_sht.cell(i, 7).value + '#' + card_sht.cell(i, 1).value
+            if current_prov_card == k:
+                card_sht.cell(i, 9).value = v
+                is_new_item = False
+                is_new_cardtype = False
+                break
+        # 处理新增的 卡类型-省份
+        if is_new_item == True:
+            for i in range(2, card_last_row):
+                if card_sht.cell(i, 1).value == k.split('#')[1]:
+                    is_new_cardtype = False
+                    # 处理当前卡类型首次出现投放区域的状况
+                    if card_sht.cell(i, 7).value == '—':
+                        card_sht.cell(i, 7).value = k.split('#')[0]
+                        card_sht.cell(i, 9).value = v
+                    # 处理当前卡类型之前有绑卡，本次新增投放机构的状况
+                    else:
+                        card_sht.insert_rows(i)
+                        card_sht.cell(i, 1).value = k.split('#')[1]
+                        card_sht.cell(i, 7).value = k.split('#')[0]
+                        card_sht.cell(i, 9).value = v
+                    for j in range(10, card_last_col + 1):
+                        card_sht.cell(i, j).value = 0
+                    break
+        # 处理新增的卡类型
+        if is_new_cardtype == True:
+            temp_cardtype = k.split('#')[1]
+            print(f'>>>>>>>> 出现了新的发卡机构【{temp_cardtype}】，请注意 <<<<<<<<\n')
+            card_sht.insert_rows(card_last_row-1)
+            card_sht.cell(card_last_row-2, 1).value = k.split('#')[1]
+            card_sht.cell(card_last_row-2, 7).value = k.split('#')[0]
+            card_sht.cell(card_last_row-2, 9).value = v
+            for j in range(10, prov_last_col + 1):
+                card_sht.cell(card_last_row-2, j).value = 0
 
+        card_last_row = card_sht.max_row
 
-    # 《企业投放统计表》数据写入
+    for i in range(2, card_last_row):
+        # 将之前有过绑卡记录但是现在为0的以及至今从未发出卡的卡类型用 0来补全
+        if not card_sht.cell(i, 7).value + '#' + card_sht.cell(i, 1).value in prov_card_dict.keys():
+            card_sht.cell(i, 9).value = 0
+
+        if card_sht.cell(i, 1).value in card_info_dict.keys():
+            card_sht.cell(i, 2).value = card_info_dict[card_sht.cell(i, 1).value][0]         # 写入卡类型所属的企业
+            card_sht.cell(i, 3).value = card_info_dict[card_sht.cell(i, 1).value][1]         # 写入卡类型的购卡数量
+
+        # 计算卡类型总已发卡数
+        if card_sht.cell(i, 1).value in card_dict.keys():
+            card_sht.cell(i, 5).value = card_dict[card_sht.cell(i, 1).value]
+        else:
+            card_sht.cell(i, 5).value = 0
+        
+        card_sht.cell(i, 4).value = card_sht.cell(i, 5).value / card_sht.cell(i, 3).value       # 本卡投放进度
+        card_sht.cell(i, 6).value = card_sht.cell(i, 5).value / sum_card_numb_now               # 占所有卡的投放比例
+        card_sht.cell(i, 8).value = card_sht.cell(i, 9).value - card_sht.cell(i, 10).value      # 本周增长数
+
+    # 计算最后一行的总结列
+    card_sht.cell(card_last_row, 3).value = sold_card_numb                          # 华医售卡总数量
+    card_sht.cell(card_last_row, 4).value = sum_card_numb_now / sold_card_numb      # 所有卡的投放总进度
+    card_sht.cell(card_last_row, 5).value = sum_card_numb_now                       # 所有卡总绑卡数
+    card_sht.cell(card_last_row, 6).value = 1                                       #占所有已投放卡的比例
+    card_sht.cell(card_last_row, 8).value = sum_card_numb_now - card_sht.cell(card_last_row, 10).value
+    card_sht.cell(card_last_row, 9).value = sum_card_numb_now
+
+    #............《企业投放统计表》............
     cpy_sht.insert_cols(10)
     cpy_sht['J1'].value = today_date
+    cpy_dict: dict = {}
+    
+    for k,v in card_info_dict:
+        cpy_dict.setdefault(v[0],[0,0])             # 如果key第一次出现，设置该key的值为列表 [企业总购卡数为0，企业总绑卡数为0]
+        cpy_dict[v[0]][0] += v[1]                   # 企业累积购卡数
+        if k in card_dict.keys():
+            cpy_dict[v[0]][1] += card_dict[k]       # 企业累积绑卡数 
+
+
+    for i in range(2, cpy_last_row):
+        # 计算企业的相关数据
+        cpy_sht.cell(i,2).value = cpy_dict[cpy_sht.cell(i,1).value][0]                # 企业总购卡数
+        cpy_sht.cell(i,3).value = cpy_dict[cpy_sht.cell(i,1).value][1]                # 企业总绑卡数
+        cpy_sht.cell(i,4).value = cpy_sht.cell(i,3).value / cpy_sht.cell(i,2).value   # 企业投放进度
+
+        # 计算卡类的相关数据
+        if cpy_sht.cell(i,5).value in card_dict.keys():
+            cpy_sht.cell(i,10).value = card_dict[cpy_sht.cell(i,5).value]
+        else:
+            cpy_sht.cell(i, 10).value = 0
+        cpy_sht.cell(i, 8).value = cpy_sht.cell(i, 10).value / cpy_sht.cell(i,7).value          # 计算卡的投放进度
+        cpy_sht.cell(i, 9).value = cpy_sht.cell(i, 10).value - cpy_sht.cell(i, 11).value        # 计算周增长数
+
+    # 计算最后一列的相关汇总性数据
+    cpy_sht.cell(card_last_row, 2).value = sold_card_numb                                               # 所有企业的总购卡数
+    cpy_sht.cell(card_last_row, 3).value = sum_card_numb_now                                            # 所有企业的总绑卡量
+    cpy_sht.cell(card_last_row, 4).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
+    cpy_sht.cell(card_last_row, 7).value = sold_card_numb                                               # 所有企业的总购卡数
+    cpy_sht.cell(card_last_row, 8).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
+    cpy_sht.cell(card_last_row, 9).value = sum_card_numb_now - cpy_sht.cell(card_last_row, 11).value    # 本周新增绑卡数
+
 
     # ............《Chart_Data》............
     # 【0】绑卡进度
-    # 全国绑卡数
-    chart_data_sht['C2'].value = sum_card_numb_now
+    chart_data_sht['C2'].value = sum_card_numb_now                                              # 全国绑卡数
     chart_data_sht['C3'].value = prov_limit_dict['总计'][1] - sum_card_numb_now                 # 全国剩余量
-    for i in [4, 6, 8]:
-        chart_data_sht.cell(i, 3).value = prov_dict[chart_data_sht.cell(i, 1).value]             # 三省的绑卡数
-    for i in [5, 7, 9]:
-        prov_limit_dict[chart_data_sht.cell(i, 1).value][1] - chart_data_sht.cell(i, 3).value   # 三省的剩余量
+    for i in [4, 6, 8]:                                                                         # 三省的绑卡数
+        chart_data_sht.cell(i, 3).value = prov_dict[chart_data_sht.cell(i, 1).value]            
+    for i in [5, 7, 9]:                                                                         # 三省的剩余量
+        chart_data_sht.cell(i, 3).value = prov_limit_dict[chart_data_sht.cell(i, 1).value][1] - chart_data_sht.cell(i-1, 3).value   
 
     #【0】卡数量大字标
     chart_data_sht['F2'].value = sold_card_numb                             # 累计售卡数
@@ -343,8 +449,8 @@ def statistic_data():
     chart_data_sht['I2'].value = f'学术卡数据周报 — {today_date}'    # 标题日期更新
 
     #【1】全国绑卡数趋势图
-    for i in range(13,24):
-        chart_data_sht.cell(i,3).value = month_dict[chart_data_sht.cell(i,1).value]
+    for i in range(13, 24):
+        chart_data_sht.cell(i,3).value = month_dict[str(chart_data_sht.cell(i,1).value)]
 
     #【2】TOP5 省份周增长绑卡数
     #TODO:
@@ -356,7 +462,7 @@ def statistic_data():
     #TODO:
 
     #【5】省份绑卡状况数据地图
-    for i in range(28,62):
+    for i in range(28, 62):
         chart_data_sht.cell(i,7).value = prov_dict[chart_data_sht.cell(i,6).value]
 
     #【6】企业购卡数量柱状图
@@ -364,8 +470,15 @@ def statistic_data():
 
 
     #【7】TOP10 城市绑卡数量分布图
+
     #【8】各小时内绑卡数量趋势图
+    for i in range(65, 89):
+        chart_data_sht.cell(i,7).value = hour_dict[str(chart_data_sht.cell(i,6).value)]
+
     #【9】绑卡医生医院级别比例
+    for i in range(65, 72):
+        chart_data_sht.cell(i,11).value = hosp_dict[str(chart_data_sht.cell(i,10).value)]
+
 
 
     # ------------------- 删除掉多余的数据表格 -------------------
@@ -380,8 +493,9 @@ def statistic_data():
     report_wb_path: str = os.path.join(workspace_path, 'history', f'华医网学术卡数据周报-{today_date}.xlsx')
     template_wb.save(report_wb_path)
 
+    step_numb += 1
+    print(f'【STEP-{step_numb}】文件保存\n\t\t[OK] --> 已经完成工作簿的保存！\n')
 
-    print("【STEP-10】数据写入文件保存\n\t\t [OK] --> 已经将数据写入到表格中并完成保存！\n")
 
 
 # ------------------------------ 主体调用部分 ------------------------------
