@@ -31,6 +31,7 @@ import re
 1.因用openpyxl会使得表格的样式变化，请将表格单独复制，并用Chart_Data进行数据替换
 2.更新一页图表中的周报完成日期与时间的更新
 3.使用格式刷来将新插入的行的样式使之一致
+4.箱图和地图复制粘贴为图片，以防低版本office或者wps不兼容，显示失败
 
 
 '''
@@ -119,6 +120,7 @@ def statistic_data():
     card_sht = template_wb['卡类状况']
     cpy_sht = template_wb['企业投放统计']
     
+
 
     # 备份并重命名《学习记录》原始数据表
     data_sht = data_wb.copy_worksheet(data_wb['sheet0'])
@@ -323,7 +325,7 @@ def statistic_data():
     # ............《卡类状况表》............
     card_sht.insert_cols(9)
     card_sht['I1'].value = today_date
-    card_last_col: int = card_sht.max_col
+    card_last_col: int = card_sht.max_column
     card_last_row: int = card_sht.max_row
 
     for k, v in prov_card_dict.items():
@@ -359,7 +361,7 @@ def statistic_data():
         # 处理新增的卡类型
         if is_new_cardtype == True:
             temp_cardtype = k.split('#')[1]
-            print(f'>>>>>>>> 出现了新的发卡机构【{temp_cardtype}】，请注意 <<<<<<<<\n')
+            print(f'>>>>>>>> 出现了新的卡类型【{temp_cardtype}】，请注意 <<<<<<<<\n')
             card_sht.insert_rows(card_last_row-1)
             card_sht.cell(card_last_row-2, 1).value = k.split('#')[1]
             card_sht.cell(card_last_row-2, 7).value = k.split('#')[0]
@@ -368,15 +370,18 @@ def statistic_data():
                 card_sht.cell(card_last_row-2, j).value = 0
 
         card_last_row = card_sht.max_row
+    
+    card_last_row = card_sht.max_row
 
     for i in range(2, card_last_row):
         # 将之前有过绑卡记录但是现在为0的以及至今从未发出卡的卡类型用 0来补全
         if not card_sht.cell(i, 7).value + '#' + card_sht.cell(i, 1).value in prov_card_dict.keys():
             card_sht.cell(i, 9).value = 0
 
-        if card_sht.cell(i, 1).value in card_info_dict.keys():
-            card_sht.cell(i, 2).value = card_info_dict[card_sht.cell(i, 1).value][0]         # 写入卡类型所属的企业
-            card_sht.cell(i, 3).value = card_info_dict[card_sht.cell(i, 1).value][1]         # 写入卡类型的购卡数量
+        # if card_sht.cell(i, 1).value in card_info_dict.keys():
+        
+        card_sht.cell(i, 2).value = card_info_dict[card_sht.cell(i, 1).value][0]         # 写入卡类型所属的企业
+        card_sht.cell(i, 3).value = card_info_dict[card_sht.cell(i, 1).value][1]         # 写入卡类型的购卡数量
 
         # 计算卡类型总已发卡数
         if card_sht.cell(i, 1).value in card_dict.keys():
@@ -401,7 +406,7 @@ def statistic_data():
     cpy_sht['J1'].value = today_date
     cpy_dict: dict = {}
     
-    for k,v in card_info_dict:
+    for k,v in card_info_dict.items():
         cpy_dict.setdefault(v[0],[0,0])             # 如果key第一次出现，设置该key的值为列表 [企业总购卡数为0，企业总绑卡数为0]
         cpy_dict[v[0]][0] += v[1]                   # 企业累积购卡数
         if k in card_dict.keys():
@@ -423,16 +428,17 @@ def statistic_data():
         cpy_sht.cell(i, 9).value = cpy_sht.cell(i, 10).value - cpy_sht.cell(i, 11).value        # 计算周增长数
 
     # 计算最后一列的相关汇总性数据
-    cpy_sht.cell(card_last_row, 2).value = sold_card_numb                                               # 所有企业的总购卡数
-    cpy_sht.cell(card_last_row, 3).value = sum_card_numb_now                                            # 所有企业的总绑卡量
-    cpy_sht.cell(card_last_row, 4).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
-    cpy_sht.cell(card_last_row, 7).value = sold_card_numb                                               # 所有企业的总购卡数
-    cpy_sht.cell(card_last_row, 8).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
-    cpy_sht.cell(card_last_row, 9).value = sum_card_numb_now - cpy_sht.cell(card_last_row, 11).value    # 本周新增绑卡数
-
+    cpy_sht.cell(cpy_last_row, 2).value = sold_card_numb                                               # 所有企业的总购卡数
+    cpy_sht.cell(cpy_last_row, 3).value = sum_card_numb_now                                            # 所有企业的总绑卡量
+    cpy_sht.cell(cpy_last_row, 4).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
+    cpy_sht.cell(cpy_last_row, 7).value = sold_card_numb                                               # 所有企业的总购卡数
+    cpy_sht.cell(cpy_last_row, 8).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
+    cpy_sht.cell(cpy_last_row, 9).value = sum_card_numb_now - cpy_sht.cell(cpy_last_row, 11).value     # 本周新增绑卡数
+    cpy_sht.cell(cpy_last_row, 9).value = sum_card_numb_now                                            # 所有企业的总绑卡量                      
 
     # ............《Chart_Data》............
     # 【0】绑卡进度
+    #TODO:自动设置为选择绑卡进度最快的三个省份，且图表中省份名称是粘贴源自此的链接
     chart_data_sht['C2'].value = sum_card_numb_now                                              # 全国绑卡数
     chart_data_sht['C3'].value = prov_limit_dict['总计'][1] - sum_card_numb_now                 # 全国剩余量
     for i in [4, 6, 8]:                                                                         # 三省的绑卡数
@@ -443,7 +449,8 @@ def statistic_data():
     #【0】卡数量大字标
     chart_data_sht['F2'].value = sold_card_numb                             # 累计售卡数
     chart_data_sht['F3'].value = sum_card_numb_now                          # 累计绑卡数
-    chart_data_sht['F4'].value = prov_sht.cell(prov_last_row, 8).value      # 本周新绑卡数
+    the_weekup_numb: int = prov_sht.cell(prov_last_row, 8).value
+    chart_data_sht['F4'].value = the_weekup_numb                            # 本周新绑卡数
     chart_data_sht['F5'].value = avg_week_card                              # 平均周绑卡数
 
     chart_data_sht['I2'].value = f'学术卡数据周报 — {today_date}'    # 标题日期更新
@@ -453,23 +460,74 @@ def statistic_data():
         chart_data_sht.cell(i,3).value = month_dict[str(chart_data_sht.cell(i,1).value)]
 
     #【2】TOP5 省份周增长绑卡数
-    #TODO:
+    prov_weekup_dict: dict = {}      # 省份的本周增长数字典
+    for i in range(2, prov_last_row):
+        prov_weekup_dict.setdefault(prov_sht.cell(i,1).value, 0)
+        prov_weekup_dict[prov_sht.cell(i, 1).value] += prov_sht.cell(i, 8).value
+
+    # 生成按照新增数由大到小的元组列表
+    sorted_prov_weekup_list: list = sorted(prov_weekup_dict.items(), key=lambda item:item[0],reverse=True)
+    countr_avg: int = int(chart_data_sht['F4'].value / len(orig_prov_dict))     # 全国平均本周每个省的增长数量
+    temp_index: int = 0                 # 排序列表中元组的索引
+    for i in range(14,19):
+        chart_data_sht.cell(i, 5).value = sorted_prov_weekup_list[temp_index][0]
+        chart_data_sht.cell(i, 6).value = sorted_prov_weekup_list[temp_index][1]
+        chart_data_sht.cell(i, 7).value = countr_avg
+        temp_index += 1
 
     #【3】TOP5 卡类型周增长绑卡数箱型图
-    #TODO:
+    card_weekup_dict: dict = {}
+    for i in range(2, cpy_last_row):
+        card_weekup_dict.setdefault(cpy_sht.cell(i,5).value,0)
+        card_weekup_dict[cpy_sht.cell(i,5).value] += cpy_sht.cell(i,9).value
+    sorted_card_weekup_list: list = sorted(card_dict.items(), key=lambda item:item[0],reverse=True)
+    temp_index: int = 0                 # 排序列表中元组的索引
+    other_card_weekup_numb: int = the_weekup_numb
+    for i in range(14, 19):
+        chart_data_sht.cell(i, 10).value = sorted_card_weekup_list[temp_index][0].replace('2019','').replace('2018','').replace('-5分','')
+        chart_data_sht.cell(i, 11).value = sorted_card_weekup_list[temp_index][1]
+        temp_index += 1
+        the_weekup_numb -= sorted_card_weekup_list[temp_index][1]
+
+    chart_data_sht['K19'].value = the_weekup_numb
+
 
     #【4】TOP10 省份绑卡数量分布图
-    #TODO:
+    sorted_prov_list: list = sorted(prov_dict.items(), key=lambda item:item[0],reverse=True)
+    temp_index: int = 0                 # 排序列表中元组的索引
+    for i in range(27, 37):
+        chart_data_sht.cell(i, 2).value = sorted_prov_list[temp_index][0]
+        chart_data_sht.cell(i, 3).value = sorted_prov_list[temp_index][1]
+        temp_index += 1
+
 
     #【5】省份绑卡状况数据地图
     for i in range(28, 62):
         chart_data_sht.cell(i,7).value = prov_dict[chart_data_sht.cell(i,6).value]
 
     #【6】企业购卡数量柱状图
-    #TODO:
+    cpy_bought_dict: dict = {}      # 企业的本周增长数字典
+    for k,v in cpy_dict.items():
+        cpy_bought_dict.setdefault(k, 0)
+        cpy_bought_dict[k] += v[0]
 
+    # 生成按照新增数由大到小的元组列表
+    sorted_cpy_bought_list: list = sorted(cpy_bought_dict.items(), key=lambda item:item[0],reverse=True)
+    temp_index: int = 0                 # 排序列表中元组的索引
+    other_bought_numb: int = sold_card_numb 
+    for i in range(27, 35):
+        chart_data_sht.cell(i, 10).value = sorted_cpy_bought_list[temp_index][0]
+        chart_data_sht.cell(i, 11).value = sorted_cpy_bought_list[temp_index][1]
+        temp_index += 1
+        other_bought_numb -= sorted_cpy_bought_list[temp_index][1]
 
     #【7】TOP10 城市绑卡数量分布图
+    sorted_city_list: list = sorted(city_dict.items(), key=lambda item:item[0],reverse=True)
+    temp_index: int = 0                 # 排序列表中元组的索引
+    for i in range(65, 75):
+        chart_data_sht.cell(i, 2).value = sorted_city_list[temp_index][0]
+        chart_data_sht.cell(i, 3).value = sorted_city_list[temp_index][1]
+        temp_index += 1
 
     #【8】各小时内绑卡数量趋势图
     for i in range(65, 89):
@@ -480,22 +538,68 @@ def statistic_data():
         chart_data_sht.cell(i,11).value = hosp_dict[str(chart_data_sht.cell(i,10).value)]
 
 
-
-    # ------------------- 删除掉多余的数据表格 -------------------
-
-    # ------------------- 合并单元格 -------------------
-
     # ------------------- 检查数据是否存在误差 -------------------
 
 
     # ------------------- 表格的保存 -------------------
     data_wb.save(data_xlsx_path)
-    report_wb_path: str = os.path.join(workspace_path, 'history', f'华医网学术卡数据周报-{today_date}.xlsx')
+    history_path: str = os.path.join(workspace_path, 'history', today_date)
+    if not os.path.exists(history_path):
+        os.makedirs(history_path)
+    report_wb_path: str = os.path.join(history_path, f'周报数据-{today_date}-UnMerged.xlsx')
     template_wb.save(report_wb_path)
-
+    shutil.copy(os.path.join(workspace_path, '【图表模板】华医网学术卡数据周报.xlsx'),
+                os.path.join(history_path, f'华医网学术卡数据周报-{today_date}.xlsx'))
     step_numb += 1
     print(f'【STEP-{step_numb}】文件保存\n\t\t[OK] --> 已经完成工作簿的保存！\n')
 
+
+def generate_new_template():
+    '''
+    【功能】生成新的数据模板
+    '''
+    global step_numb
+    report_path: str = os.path.join(workspace_path, 'history', today_date, f'周报数据-{today_date}-UnMerged.xlsx')
+    template_path: str = os.path.join(workspace_path, '【数据模板】华医网学术卡数据周报.xlsx')
+    template_wb = load_workbook(report_path)
+
+    # 清空《省份分布表》与《卡类状况表》数据
+    for sheet_name in ['省份分布','卡类状况']:
+        for i in range(2, template_wb[sheet_name].max_row + 1):
+            for j in [2,3,4,5,6,8]:
+                template_wb[sheet_name].cell(i,j).value = ''
+        template_wb[sheet_name].cell(template_wb[sheet_name].max_row,2).value = '——'
+
+    # 清空《企业投放统计表》数据
+    for i in range(2, template_wb['企业投放统计'].max_row + 1):
+        for j in [2,3,4,8,9]:
+            template_wb['企业投放统计'].cell(i,j).value = ''
+    
+    # 清空《Chart_Data》数据
+    data_rng_list: list = [ 'C2:C9', 'F2:F5', 'I2', 
+                            'C12:C23', 'E14:G18', 'J14:J18', 'K14:K19',
+                            'B27:C36', 'G28:G61', 'J27:J33', 'K27:K34',
+                            'B65:C74', 'G65:G88', 'K65:K71']
+    for data_rng in data_rng_list:
+        for cell_rng in template_wb['Chart_Data'][data_rng]:
+            cell_rng[0].value = ''
+
+    # 表格的保存
+
+    step_numb += 1
+    print(f'【STEP-{step_numb}】生成新模板\n\t\t[OK] --> 已经生成并保存新的数据模板！\n')
+
+
+def merge_cells():
+    '''
+    【功能】根据首列单元格一致的，合并相应的单元格
+    '''
+    global step_numb
+
+
+
+    step_numb += 1
+    print(f'【STEP-{step_numb}】合并单元格\n\t\t[OK] --> 已经根据首列合并单元格并保存文件！\n')
 
 
 # ------------------------------ 主体调用部分 ------------------------------
@@ -515,4 +619,7 @@ def huayi_card_report():
         print(f'【STEP-{step_numb}】爬虫下载原始数据\n\t\t[ERROR] --> 未能从服务器中成功爬取数据:状态码为 {data_result[0]}\n')
 
 
-huayi_card_report()
+# huayi_card_report()
+statistic_data()
+
+#TODO: 进度预警
