@@ -14,7 +14,7 @@ from sys import intern
 import win32com.client as win32
 import datetime
 from openpyxl import load_workbook
-from openpyxl.styles import Font, Border, Side, Alignment
+from openpyxl.styles import Font, Border, Side, Alignment, PatternFill, NamedStyle
 import sys
 import time
 import re
@@ -22,18 +22,14 @@ import re
 
 ''' 
 ------------------- 提前的准备工作 -----------------------
+1. 在《企业投放统计》表格中检查卡类型是否完全，购卡数量是否更新
 
-2. 在《企业投放统计》表格中新增卡类型
-3. 
 
 ------------------- 之后的收尾工作 -----------------------
-
 1.因用openpyxl会使得表格的样式变化，请将表格单独复制，并用Chart_Data进行数据替换
 2.更新一页图表中的周报完成日期与时间的更新
 3.使用格式刷来将新插入的行的样式使之一致
 4.箱图和地图复制粘贴为图片，以防低版本office或者wps不兼容，显示失败
-
-
 '''
 
 # 全局变量的定义及赋值
@@ -113,13 +109,13 @@ def statistic_data():
     # 载入表格
     data_xlsx_path: str = os.path.join(workspace_path, 'data', f'华医学术卡原始数据-{today_date}.xlsx')
     data_wb = load_workbook(data_xlsx_path)
+
     template_xlsx_path: str = os.path.join(workspace_path, '【数据模板】华医网学术卡数据周报.xlsx')
     template_wb = load_workbook(template_xlsx_path)
     chart_data_sht = template_wb['Chart_Data']
     prov_sht = template_wb['省份分布']
     card_sht = template_wb['卡类状况']
     cpy_sht = template_wb['企业投放统计']
-    
 
 
     # 备份并重命名《学习记录》原始数据表
@@ -307,7 +303,7 @@ def statistic_data():
             prov_sht.cell(i, 6).value = '超出！'
         else:
             prov_sht.cell(i, 5).value = prov_sht.cell(i, 3).value - prov_sht.cell(i, 4).value     # 计算卡的剩余量
-            prov_sht.cell(i, 6).value = 100*prov_sht.cell(i, 4).value / prov_sht.cell(i, 3).value # 计算投放进度
+            prov_sht.cell(i, 6).value = prov_sht.cell(i, 4).value / prov_sht.cell(i, 3).value # 计算投放进度
         if prov_sht.cell(i, 6).value != '超出！' and prov_sht.cell(i, 6).value > 100:
             prov_sht.cell(i, 6).value = '超出！'
         prov_sht.cell(i, 8).value = prov_sht.cell(i, 9).value - prov_sht.cell(i, 10).value    # 计算本周增加数
@@ -363,11 +359,11 @@ def statistic_data():
             temp_cardtype = k.split('#')[1]
             print(f'>>>>>>>> 出现了新的卡类型【{temp_cardtype}】，请注意 <<<<<<<<\n')
             card_sht.insert_rows(card_last_row-1)
-            card_sht.cell(card_last_row-2, 1).value = k.split('#')[1]
-            card_sht.cell(card_last_row-2, 7).value = k.split('#')[0]
-            card_sht.cell(card_last_row-2, 9).value = v
-            for j in range(10, prov_last_col + 1):
-                card_sht.cell(card_last_row-2, j).value = 0
+            card_sht.cell(card_last_row-1, 1).value = k.split('#')[1]
+            card_sht.cell(card_last_row-1, 7).value = k.split('#')[0]
+            card_sht.cell(card_last_row-1, 9).value = v
+            for j in range(10, card_last_col + 1):
+                card_sht.cell(card_last_row-1, j).value = 0
 
         card_last_row = card_sht.max_row
     
@@ -434,7 +430,7 @@ def statistic_data():
     cpy_sht.cell(cpy_last_row, 7).value = sold_card_numb                                               # 所有企业的总购卡数
     cpy_sht.cell(cpy_last_row, 8).value = sum_card_numb_now / sold_card_numb                           # 所有卡的投放总进度
     cpy_sht.cell(cpy_last_row, 9).value = sum_card_numb_now - cpy_sht.cell(cpy_last_row, 11).value     # 本周新增绑卡数
-    cpy_sht.cell(cpy_last_row, 9).value = sum_card_numb_now                                            # 所有企业的总绑卡量                      
+    cpy_sht.cell(cpy_last_row, 10).value = sum_card_numb_now                                            # 所有企业的总绑卡量                      
 
     # ............《Chart_Data》............
     # 【0】绑卡进度
@@ -466,7 +462,7 @@ def statistic_data():
         prov_weekup_dict[prov_sht.cell(i, 1).value] += prov_sht.cell(i, 8).value
 
     # 生成按照新增数由大到小的元组列表
-    sorted_prov_weekup_list: list = sorted(prov_weekup_dict.items(), key=lambda item:item[0],reverse=True)
+    sorted_prov_weekup_list: list = sorted(prov_weekup_dict.items(), key=lambda item:item[1],reverse=True)
     countr_avg: int = int(chart_data_sht['F4'].value / len(orig_prov_dict))     # 全国平均本周每个省的增长数量
     temp_index: int = 0                 # 排序列表中元组的索引
     for i in range(14,19):
@@ -480,7 +476,7 @@ def statistic_data():
     for i in range(2, cpy_last_row):
         card_weekup_dict.setdefault(cpy_sht.cell(i,5).value,0)
         card_weekup_dict[cpy_sht.cell(i,5).value] += cpy_sht.cell(i,9).value
-    sorted_card_weekup_list: list = sorted(card_dict.items(), key=lambda item:item[0],reverse=True)
+    sorted_card_weekup_list: list = sorted(card_dict.items(), key=lambda item:item[1],reverse=True)
     temp_index: int = 0                 # 排序列表中元组的索引
     other_card_weekup_numb: int = the_weekup_numb
     for i in range(14, 19):
@@ -493,7 +489,7 @@ def statistic_data():
 
 
     #【4】TOP10 省份绑卡数量分布图
-    sorted_prov_list: list = sorted(prov_dict.items(), key=lambda item:item[0],reverse=True)
+    sorted_prov_list: list = sorted(prov_dict.items(), key=lambda item:item[1],reverse=True)
     temp_index: int = 0                 # 排序列表中元组的索引
     for i in range(27, 37):
         chart_data_sht.cell(i, 2).value = sorted_prov_list[temp_index][0]
@@ -512,7 +508,7 @@ def statistic_data():
         cpy_bought_dict[k] += v[0]
 
     # 生成按照新增数由大到小的元组列表
-    sorted_cpy_bought_list: list = sorted(cpy_bought_dict.items(), key=lambda item:item[0],reverse=True)
+    sorted_cpy_bought_list: list = sorted(cpy_bought_dict.items(), key=lambda item:item[1],reverse=True)
     temp_index: int = 0                 # 排序列表中元组的索引
     other_bought_numb: int = sold_card_numb 
     for i in range(27, 35):
@@ -522,7 +518,7 @@ def statistic_data():
         other_bought_numb -= sorted_cpy_bought_list[temp_index][1]
 
     #【7】TOP10 城市绑卡数量分布图
-    sorted_city_list: list = sorted(city_dict.items(), key=lambda item:item[0],reverse=True)
+    sorted_city_list: list = sorted(city_dict.items(), key=lambda item:item[1],reverse=True)
     temp_index: int = 0                 # 排序列表中元组的索引
     for i in range(65, 75):
         chart_data_sht.cell(i, 2).value = sorted_city_list[temp_index][0]
@@ -554,6 +550,83 @@ def statistic_data():
     print(f'【STEP-{step_numb}】文件保存\n\t\t[OK] --> 已经完成工作簿的保存！\n')
 
 
+def convent_column_to_char(column_numb: int) -> str:
+	"""
+	【功能】将数字列数转换为Excel用英文字母表示的列数
+	【示例】1 => A, 2 => B, ......, 27 => AA
+	"""
+	tStr: str = str()
+	while column_numb != 0:
+		res = column_numb % 26
+		if res == 0:
+			res = 26
+			column_numb -= 26
+		tStr = chr(ord('A') + res - 1) + tStr
+		column_numb = column_numb // 26
+	return tStr
+
+
+def set_format():
+    '''
+    【功能】设置表格的样式
+    '''
+    global step_numb
+    # 公用样式
+    grey_border = Border(left=Side(border_style='thin', color='c0c0c000'),
+                        right=Side(border_style='thin', color='c0c0c000'),
+                        top=Side(border_style='thin', color='c0c0c000'),
+                        bottom=Side(border_style='thin', color='c0c0c000'))
+    center_align = Alignment(horizontal='center', vertical='center', wrap_text=False)
+    regular_font = Font(name='微软雅黑', size=11, bold=False, color='#00000000')
+
+    # 设置首行的单元格样式
+    title_style = NamedStyle(name='title_style', border=grey_border, alignment=center_align)
+    title_style.font = Font(name='微软雅黑',size=11, bold=True, color='#ffffff00')
+    title_style.fill = PatternFill(bgColor='#0070c000')
+
+    # 设置常规内容的单元格样式
+    white_regular_style = NamedStyle(name='regular_style', font=regular_font, border=grey_border, alignment=center_align, 
+                                    fill=PatternFill(bgColor='#00000000'))
+    blue_regular_style = NamedStyle(name='regular_style', font=regular_font, border=grey_border, alignment=center_align, 
+                                    fill=PatternFill(bgColor='#d9e1f200'))
+
+    # 设置总结行的单元格样式
+    summary_style = NamedStyle(name='summary_style', alignment=center_align)
+    summary_style.font = Font(name='微软雅黑',size=11, bold=True, color='#0070c000')
+    summary_style.border = Border(left=Side(border_style='thin', color='#c0c0c000'),
+                                right=Side(border_style='thin', color='#c0c0c000'),
+                                top=Side(border_style='regular', color='#0070c000'),
+                                bottom=Side(border_style='thin', color='#c0c0c000'))
+
+    # 
+    dst_xlsx_path: str = os.path.join(workspace_path, 'history', today_date, f'周报数据-{today_date}-UnMerged.xlsx')
+    dst_wb = load_workbook(dst_xlsx_path)
+    sht_name_list: list = ['省份分布', '卡类状况', '企业投放统计']
+    for sht_name in sht_name_list:
+        cur_sht = dst_wb[sht_name]
+        cur_last_col: int = cur_sht.max_column
+        cur_last_row: int = cur_sht.max_row
+        cur_last_row_char: str = convent_column_to_char(cur_last_col)
+
+        cur_sht[f'A1:{cur_last_row_char}1'].style = title_style     # 设置首行的样式
+        cur_sht[f'A{str(cur_last_row)}:{cur_last_row_char}{str(cur_last_row)}'].style = summary_style   # 设置总结行的样式
+
+        first_col_value_list: list = []
+        for i in range(2, cur_last_row):
+            v: str = cur_sht.cell(i, 1).value
+            if not v in first_col_value_list:
+                first_col_value_list.append(v)
+
+            if first_col_value_list.index(v)%2 == 1:
+                cur_sht[f'A{str(i)}:{cur_last_row_char}{str(i)}'].style = white_regular_style
+            else:
+                cur_sht[f'A{str(i)}:{cur_last_row_char}{str(i)}'].style = blue_regular_style
+    
+    dst_wb.save(dst_xlsx_path)
+    step_numb += 1
+    print(f'【STEP-{step_numb}】表格样式调整\n\t\t[OK] --> 已经表格样式的调整！\n')
+
+
 def generate_new_template():
     '''
     【功能】生成新的数据模板
@@ -561,30 +634,34 @@ def generate_new_template():
     global step_numb
     report_path: str = os.path.join(workspace_path, 'history', today_date, f'周报数据-{today_date}-UnMerged.xlsx')
     template_path: str = os.path.join(workspace_path, '【数据模板】华医网学术卡数据周报.xlsx')
-    template_wb = load_workbook(report_path)
+    history_tempalte_path: str = os.path.join(workspace_path, 'template', f'Template_Data_{today_date}.xlsx')
+    report_wb = load_workbook(report_path)
 
     # 清空《省份分布表》与《卡类状况表》数据
     for sheet_name in ['省份分布','卡类状况']:
-        for i in range(2, template_wb[sheet_name].max_row + 1):
+        for i in range(2, report_wb[sheet_name].max_row + 1):
             for j in [2,3,4,5,6,8]:
-                template_wb[sheet_name].cell(i,j).value = ''
-        template_wb[sheet_name].cell(template_wb[sheet_name].max_row,2).value = '——'
+                report_wb[sheet_name].cell(i,j).value = ''
+        report_wb[sheet_name].cell(report_wb[sheet_name].max_row,2).value = '——'
 
     # 清空《企业投放统计表》数据
-    for i in range(2, template_wb['企业投放统计'].max_row + 1):
+    for i in range(2, report_wb['企业投放统计'].max_row + 1):
         for j in [2,3,4,8,9]:
-            template_wb['企业投放统计'].cell(i,j).value = ''
+            report_wb['企业投放统计'].cell(i,j).value = ''
     
     # 清空《Chart_Data》数据
-    data_rng_list: list = [ 'C2:C9', 'F2:F5', 'I2', 
+    data_rng_list: list = [ 'C2:C9', 'F2:F5', 'I2:I2', 
                             'C12:C23', 'E14:G18', 'J14:J18', 'K14:K19',
                             'B27:C36', 'G28:G61', 'J27:J33', 'K27:K34',
                             'B65:C74', 'G65:G88', 'K65:K71']
     for data_rng in data_rng_list:
-        for cell_rng in template_wb['Chart_Data'][data_rng]:
-            cell_rng[0].value = ''
+        for cell_rng in report_wb['Chart_Data'][data_rng]:
+            for j in range(len(cell_rng)):
+                cell_rng[j].value = ''
 
     # 表格的保存
+    shutil.move(template_path, history_tempalte_path)
+    report_wb.save(template_path)
 
     step_numb += 1
     print(f'【STEP-{step_numb}】生成新模板\n\t\t[OK] --> 已经生成并保存新的数据模板！\n')
@@ -613,13 +690,14 @@ def huayi_card_report():
         step_numb += 1
         print(f'【STEP-{step_numb}】文件格式转换\n\t\t[OK] --> 已经将文件转化为xlsx格式!\n')
         statistic_data()
+        generate_new_template()
+        # merge_cells()
         print('-'*100 + '\n统计完成，请自行检查核对一下数据及样式是否正确！！！\n')
     else:
         step_numb += 1
         print(f'【STEP-{step_numb}】爬虫下载原始数据\n\t\t[ERROR] --> 未能从服务器中成功爬取数据:状态码为 {data_result[0]}\n')
 
 
-# huayi_card_report()
-statistic_data()
+huayi_card_report()
 
 #TODO: 进度预警
