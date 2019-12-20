@@ -161,7 +161,7 @@ def statistic_data():
                     if data_sht.cell(i, int(v)).value in outlier_list:
                         data_sht.cell(i, int(v)).value = '其他'
                     if k == '城市' and data_sht.cell(i, int(v)).value in city_outlier_list:
-                        data_sht.cell(i, int(v)).value += data_sht.cell(i, int(content_col_dict['省份'])).value
+                        data_sht.cell(i, int(v)).value = data_sht.cell(i, int(content_col_dict['省份'])).value + data_sht.cell(i, int(v)).value
                     if k == '省份' and data_sht.cell(i, int(v)).value == '黑龙江森林工业总局卫生局':
                         data_sht.cell(i, int(v)).value = '黑龙江森工'
 
@@ -476,16 +476,16 @@ def statistic_data():
     for i in range(2, cpy_last_row):
         card_weekup_dict.setdefault(cpy_sht.cell(i,5).value,0)
         card_weekup_dict[cpy_sht.cell(i,5).value] += cpy_sht.cell(i,9).value
-    sorted_card_weekup_list: list = sorted(card_dict.items(), key=lambda item:item[1],reverse=True)
+    sorted_card_weekup_list: list = sorted(card_weekup_dict.items(), key=lambda item:item[1],reverse=True)
     temp_index: int = 0                 # 排序列表中元组的索引
     other_card_weekup_numb: int = the_weekup_numb
     for i in range(14, 19):
         chart_data_sht.cell(i, 10).value = sorted_card_weekup_list[temp_index][0].replace('2019','').replace('2018','').replace('-5分','')
         chart_data_sht.cell(i, 11).value = sorted_card_weekup_list[temp_index][1]
         temp_index += 1
-        the_weekup_numb -= sorted_card_weekup_list[temp_index][1]
+        other_card_weekup_numb = other_card_weekup_numb - sorted_card_weekup_list[temp_index][1]
 
-    chart_data_sht['K19'].value = the_weekup_numb
+    chart_data_sht['K19'].value = other_card_weekup_numb
 
 
     #【4】TOP10 省份绑卡数量分布图
@@ -511,11 +511,13 @@ def statistic_data():
     sorted_cpy_bought_list: list = sorted(cpy_bought_dict.items(), key=lambda item:item[1],reverse=True)
     temp_index: int = 0                 # 排序列表中元组的索引
     other_bought_numb: int = sold_card_numb 
-    for i in range(27, 35):
+    for i in range(27, 34):
         chart_data_sht.cell(i, 10).value = sorted_cpy_bought_list[temp_index][0]
         chart_data_sht.cell(i, 11).value = sorted_cpy_bought_list[temp_index][1]
         temp_index += 1
-        other_bought_numb -= sorted_cpy_bought_list[temp_index][1]
+        other_bought_numb = other_bought_numb - sorted_cpy_bought_list[temp_index][1]
+    chart_data_sht.cell(34, 10).value = '其他企业'
+    chart_data_sht.cell(34, 11).value = other_bought_numb
 
     #【7】TOP10 城市绑卡数量分布图
     sorted_city_list: list = sorted(city_dict.items(), key=lambda item:item[1],reverse=True)
@@ -535,7 +537,7 @@ def statistic_data():
 
 
     # ------------------- 检查数据是否存在误差 -------------------
-
+    #TODO:核对误差
 
     # ------------------- 表格的保存 -------------------
     data_wb.save(data_xlsx_path)
@@ -571,45 +573,60 @@ def set_format():
     【功能】设置表格的样式
     '''
     global step_numb
-    # 公用样式
-    grey_border = Border(left=Side(border_style='thin', color='c0c0c000'),
-                        right=Side(border_style='thin', color='c0c0c000'),
-                        top=Side(border_style='thin', color='c0c0c000'),
-                        bottom=Side(border_style='thin', color='c0c0c000'))
-    center_align = Alignment(horizontal='center', vertical='center', wrap_text=False)
-    regular_font = Font(name='微软雅黑', size=11, bold=False, color='#00000000')
 
-    # 设置首行的单元格样式
-    title_style = NamedStyle(name='title_style', border=grey_border, alignment=center_align)
-    title_style.font = Font(name='微软雅黑',size=11, bold=True, color='#ffffff00')
-    title_style.fill = PatternFill(bgColor='#0070c000')
-
-    # 设置常规内容的单元格样式
-    white_regular_style = NamedStyle(name='regular_style', font=regular_font, border=grey_border, alignment=center_align, 
-                                    fill=PatternFill(bgColor='#00000000'))
-    blue_regular_style = NamedStyle(name='regular_style', font=regular_font, border=grey_border, alignment=center_align, 
-                                    fill=PatternFill(bgColor='#d9e1f200'))
-
-    # 设置总结行的单元格样式
-    summary_style = NamedStyle(name='summary_style', alignment=center_align)
-    summary_style.font = Font(name='微软雅黑',size=11, bold=True, color='#0070c000')
-    summary_style.border = Border(left=Side(border_style='thin', color='#c0c0c000'),
-                                right=Side(border_style='thin', color='#c0c0c000'),
-                                top=Side(border_style='regular', color='#0070c000'),
-                                bottom=Side(border_style='thin', color='#c0c0c000'))
-
-    # 
+    # 载入表格
     dst_xlsx_path: str = os.path.join(workspace_path, 'history', today_date, f'周报数据-{today_date}-UnMerged.xlsx')
     dst_wb = load_workbook(dst_xlsx_path)
+
+    # 如果表格中未存在此定义样式，需要定义并声明
+    try:
+    # 公用样式
+        grey_border = Border(left=Side(border_style='thin', color='c0c0c0'),
+                            right=Side(border_style='thin', color='c0c0c0'),
+                            top=Side(border_style='thin', color='c0c0c0'),
+                            bottom=Side(border_style='thin', color='c0c0c0'))
+        center_align = Alignment(horizontal='center', vertical='center', wrap_text=False)
+        regular_font = Font(name='微软雅黑', size=11, bold=False, color='000000')
+
+        # 设置首行的单元格样式
+        title_style = NamedStyle(name='title_style', border=grey_border, alignment=center_align)
+        title_style.font = Font(name='微软雅黑', size=11, bold=True, color='ffffff')
+        title_style.fill = PatternFill("solid",fgColor='0070c0')
+
+        # 设置常规内容的单元格样式
+        white_content_style = NamedStyle(name='white_content_style', font=regular_font, border=grey_border, alignment=center_align,
+                                        fill=PatternFill("solid",fgColor='ffffff'))
+        blue_content_style = NamedStyle(name='blue_content_style', font=regular_font, border=grey_border, alignment=center_align,
+                                        fill=PatternFill("solid",fgColor='d9e1f2'))
+
+        # 设置总结行的单元格样式
+        summary_style = NamedStyle(name='summary_style', alignment=center_align)
+        summary_style.font = Font(name='微软雅黑', size=11, bold=True, color='0070c0')
+        summary_style.border = Border(left=Side(border_style='thin', color='c0c0c0'),
+                                    right=Side(border_style='thin',color='c0c0c0'),
+                                    top=Side(border_style='medium',color='0070c0'),
+                                    bottom=Side(border_style='thin', color='c0c0c0'))
+
+        # 使用自定义样式之前需要在表格中声明
+        dst_wb.add_named_style(title_style)
+        dst_wb.add_named_style(white_content_style)
+        dst_wb.add_named_style(blue_content_style)
+        dst_wb.add_named_style(summary_style)
+    except ValueError:
+        pass
+
     sht_name_list: list = ['省份分布', '卡类状况', '企业投放统计']
     for sht_name in sht_name_list:
         cur_sht = dst_wb[sht_name]
         cur_last_col: int = cur_sht.max_column
         cur_last_row: int = cur_sht.max_row
         cur_last_row_char: str = convent_column_to_char(cur_last_col)
+        # ----------- 设置单元格外观样式 --------------
+        for single_cell in cur_sht[1]:
+            single_cell.style = 'title_style'     # 设置首行的样式
 
-        cur_sht[f'A1:{cur_last_row_char}1'].style = title_style     # 设置首行的样式
-        cur_sht[f'A{str(cur_last_row)}:{cur_last_row_char}{str(cur_last_row)}'].style = summary_style   # 设置总结行的样式
+        for single_cell in cur_sht[cur_last_row]:
+            single_cell.style = 'summary_style'   # 设置总结行的样式
 
         first_col_value_list: list = []
         for i in range(2, cur_last_row):
@@ -617,11 +634,20 @@ def set_format():
             if not v in first_col_value_list:
                 first_col_value_list.append(v)
 
-            if first_col_value_list.index(v)%2 == 1:
-                cur_sht[f'A{str(i)}:{cur_last_row_char}{str(i)}'].style = white_regular_style
+            if first_col_value_list.index(v) % 2 == 1:
+                for single_cell in cur_sht[i]:
+                    single_cell.style = 'blue_content_style'
             else:
-                cur_sht[f'A{str(i)}:{cur_last_row_char}{str(i)}'].style = blue_regular_style
-    
+                for single_cell in cur_sht[i]:
+                    single_cell.style = 'white_content_style'
+
+        # ----------- 设置单元格内容格式 --------------
+        for j in range(1,11):  # 从前十列中寻找为“百分比格式”的列,设置显示样式
+            if '进度' in cur_sht.cell(1,j).value or '比例' in cur_sht.cell(1,j).value:
+                for x in range(2, cur_last_row + 1):
+                    cur_sht.cell(x, j).number_format = '0.00%'
+
+
     dst_wb.save(dst_xlsx_path)
     step_numb += 1
     print(f'【STEP-{step_numb}】表格样式调整\n\t\t[OK] --> 已经表格样式的调整！\n')
@@ -673,8 +699,24 @@ def merge_cells():
     '''
     global step_numb
 
+    src_xlsx_path: str = os.path.join(workspace_path, 'history', today_date, f'周报数据-{today_date}-UnMerged.xlsx')
+    dst_xlsx_path: str = os.path.join(workspace_path, 'history', today_date, f'周报数据-{today_date}-Merged.xlsx')
+    if not os.path.exists(dst_xlsx_path):
+        shutil.copyfile(src_xlsx_path, dst_xlsx_path)
+    dst_wb = load_workbook(dst_xlsx_path)
+    
+    sht_merge_col_dict: dict = {'省份分布':6, '卡类状况':6, '企业投放统计':4}
+    for sht_name, merge_last_col in sht_merge_col_dict.items():
+        cur_sht = dst_wb[sht_name]
+        cur_last_row: int = cur_sht.max_row
 
+        for i in range(cur_last_row-1, 1):
+            if cur_sht.cell(i,1).value == cur_sht.cell(i-1,1).value:
+                for j in range(1, merge_last_col+1):
+                    col_char: str = convent_column_to_char(j)
+                    cur_sht.merge_cells(f'{col_char}{str(i-1)}:{col_char}{str(i)}')
 
+    dst_wb.save(dst_xlsx_path)
     step_numb += 1
     print(f'【STEP-{step_numb}】合并单元格\n\t\t[OK] --> 已经根据首列合并单元格并保存文件！\n')
 
@@ -690,8 +732,9 @@ def huayi_card_report():
         step_numb += 1
         print(f'【STEP-{step_numb}】文件格式转换\n\t\t[OK] --> 已经将文件转化为xlsx格式!\n')
         statistic_data()
+        set_format()
         generate_new_template()
-        # merge_cells()
+        merge_cells()
         print('-'*100 + '\n统计完成，请自行检查核对一下数据及样式是否正确！！！\n')
     else:
         step_numb += 1
@@ -701,3 +744,5 @@ def huayi_card_report():
 huayi_card_report()
 
 #TODO: 进度预警
+#TODO:周增长数为负数且大于等于5，提醒
+#BUG:有其他的两个chartdata表的其他有问题
