@@ -482,8 +482,8 @@ def statistic_data():
     for i in range(14, 19):
         chart_data_sht.cell(i, 10).value = sorted_card_weekup_list[temp_index][0].replace('2019','').replace('2018','').replace('-5分','')
         chart_data_sht.cell(i, 11).value = sorted_card_weekup_list[temp_index][1]
-        temp_index += 1
         other_card_weekup_numb = other_card_weekup_numb - sorted_card_weekup_list[temp_index][1]
+        temp_index += 1
 
     chart_data_sht['K19'].value = other_card_weekup_numb
 
@@ -514,8 +514,8 @@ def statistic_data():
     for i in range(27, 34):
         chart_data_sht.cell(i, 10).value = sorted_cpy_bought_list[temp_index][0]
         chart_data_sht.cell(i, 11).value = sorted_cpy_bought_list[temp_index][1]
-        temp_index += 1
         other_bought_numb = other_bought_numb - sorted_cpy_bought_list[temp_index][1]
+        temp_index += 1
     chart_data_sht.cell(34, 10).value = '其他企业'
     chart_data_sht.cell(34, 11).value = other_bought_numb
 
@@ -745,4 +745,5 @@ huayi_card_report()
 
 #TODO: 进度预警
 #TODO:周增长数为负数且大于等于5，提醒
-#BUG:有其他的两个chartdata表的其他有问题
+#TODO:样式设置有需要优化的地方
+#TODO:进度大于一百则文本变为超出
